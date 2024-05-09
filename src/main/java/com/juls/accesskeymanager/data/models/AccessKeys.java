@@ -23,11 +23,11 @@ public class AccessKeys {
     @Column(name = "key_id")
     private long keyId;
 
-    @Column(name = "key_value")
+    @Column(name = "key_value", nullable = false)
     private String keyValue;
 
-    @Column (name = "procured_date")
-    private Date procurDate;
+    @Column (name = "procured_date", nullable = false)
+    private Date procuredDate;
 
     @Column (name = "expiry_date")
     private Date expiryDate;

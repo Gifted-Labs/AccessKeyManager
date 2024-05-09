@@ -20,7 +20,7 @@ public class Users {
     private Long userId;
 
     @Column(name = "username")
-    private String userame;
+    private String username;
 
     @Column (name="email")
     private String email;
