@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+    <html lang="en" xmlns:th="http://www.thymeleaf.org">
+        <head>
+            <meta charset="UTF-8">
+            <title>USERNAME</title>
+        </head>
+        <body>
+            <form action="#" th:action=" @{/web/search}" method="get">
+                <input type="search" name="search" id="search">
+                <input type="submit" value="Search">
+            </form>
+
+            <hr />
+
+            <table border="1">
+                <thead>
+                    <th>Email</th>
+                    <th>Access Key</th>
+                    <th>Procured Date</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                </thead>
+
+                <tbody>
+                    <tr th:each = "key : ${keys}">
+                        <td th:text= "${key.email}">Email</td>
+                        <td th:text= "${key.keyValue}">Access Key</td>
+                        <td th:text= "${key.procured_date}">Procured Date</td>
+                        <td th:text= "${key.expiry_date}">Expiry Date</td>
+                        <td th:text= "${key.status}">Status</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr />
+            <a href="#" th:href="@{/web/generate}">Generate</a>
+        </body>
+
+    </html>

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.juls.accesskeymanager.data.models.AccessKeys;
 import com.juls.accesskeymanager.data.models.Status;
 import com.juls.accesskeymanager.data.repository.AccessKeyRepo;
+import com.juls.accesskeymanager.exceptions.ActiveAccessKeyException;
 import com.juls.accesskeymanager.exceptions.BadRequestException;
 
 @Service
@@ -87,10 +88,13 @@ public class AccessKeyService {
         return accessKey;
     }
 
-    public AccessKeys generateKey(String email){
+    public AccessKeys generateKey(String email) throws BadRequestException{
         AccessKeys key = new AccessKeys();
         if (this.getActiveKeyByEmail(email)==null){
             key = generatAccessKeys(email);
+        }
+        else{
+            throw new BadRequestException("You already have an active key");
         }
     
         return this.accessKeyRepo.save(key);
