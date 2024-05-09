@@ -9,7 +9,7 @@ import java.util.List;
 import com.juls.accesskeymanager.services.AccessKeyDetails;
 import com.juls.accesskeymanager.services.AccessKeyService;
 
-@Component
+
 public class CLRunner implements CommandLineRunner {
 
     @Autowired
@@ -34,6 +34,7 @@ public class CLRunner implements CommandLineRunner {
         
         List <AccessKeyDetails> keyDetails = this.accessKeyService.getAllAccessKeys();
 
+        this.accessKeyService.revokeKey(email);
         System.out.println("AFTER REVOKING");
         System.out.println("================");
         keyDetails.forEach(System.out::println);

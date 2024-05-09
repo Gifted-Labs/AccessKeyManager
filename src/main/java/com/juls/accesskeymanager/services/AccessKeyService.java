@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.juls.accesskeymanager.data.models.AccessKeys;
 import com.juls.accesskeymanager.data.models.Status;
 import com.juls.accesskeymanager.data.repository.AccessKeyRepo;
+import com.juls.accesskeymanager.exceptions.BadRequestException;
 
 @Service
 public class AccessKeyService {
@@ -27,7 +28,7 @@ public class AccessKeyService {
 
     public List<AccessKeyDetails> getAllAccessKeys(){
         List <AccessKeys> accessKeys = this.accessKeyRepo.findAll();
-        Map <Long, AccessKeyDetails> keyDetails = new HashMap();
+        Map <Long, AccessKeyDetails> keyDetails = new HashMap<>();
         accessKeys.forEach(keys -> {
             AccessKeyDetails detials = new AccessKeyDetails();
             detials.setKeyValue(keys.getKeyValue());
@@ -43,7 +44,7 @@ public class AccessKeyService {
 
     public List <AccessKeyDetails> getAllKeysByEmail(String email){
         List <AccessKeys> accessKeys = this.accessKeyRepo.findByUserId(this.userService.getUserIdByEmail(email));
-        Map <Long, AccessKeyDetails> keyDetails = new HashMap();
+        Map <Long, AccessKeyDetails> keyDetails = new HashMap<>();
         accessKeys.forEach(keys -> {
             AccessKeyDetails detials = new AccessKeyDetails();
             detials.setKeyValue(keys.getKeyValue());
@@ -91,6 +92,7 @@ public class AccessKeyService {
         if (this.getActiveKeyByEmail(email)==null){
             key = generatAccessKeys(email);
         }
+    
         return this.accessKeyRepo.save(key);
     }
 
