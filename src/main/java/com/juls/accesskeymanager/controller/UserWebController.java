@@ -16,32 +16,14 @@ import com.juls.accesskeymanager.services.AccessKeyDetails;
 import com.juls.accesskeymanager.services.AccessKeyService;
 
 @Controller
-@RequestMapping("/web")
+@RequestMapping()
 public class UserWebController {
     
-    @Autowired
-    private AccessKeyService accessKeyService;
-    
-    @GetMapping("/all")
-    public String dashboard(Model model){
-        List <AccessKeyDetails> keyDetails = this.accessKeyService.getAllAccessKeys();
-        model.addAttribute("keys", keyDetails);
-        return "user-dashboard";
-    }
 
-    @GetMapping("/generate")
-    public String generateKey() throws BadRequestException{
-        String email = "julius@yahoo.com";
-        AccessKeys accessKey = this.accessKeyService.generateKey(email);
-        return "redirect:/web/all";
-    }
-
-
-    @GetMapping("/search")
-    public String findActiveKey(@RequestParam(value="email", required = false) String email,Model model){
-        AccessKeyDetails accessKey = this.accessKeyService.getActiveKeyByEmail(email);
-         model.addAttribute("key", accessKey);
-         return "admin-board";
+    @GetMapping("/login")
+        public String login(){
+            return "login";
         }
+
 
 }
