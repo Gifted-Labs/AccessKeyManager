@@ -12,14 +12,16 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.util.InMemoryResource;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.juls.accesskeymanager.services.UsersDetailsService;
 
-import lombok.var;
 
 @Configuration
 @EnableWebSecurity
@@ -64,6 +66,9 @@ public class ApplicationSecurityConfig {
         return encoder;
     }
 
-
+    @Bean
+    public UsersDetailsService userDetailsService(){
+        var usd = new InMemoryUserDetailsManager();
+        
 
 }
