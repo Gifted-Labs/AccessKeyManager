@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import com.juls.accesskeymanager.data.models.AccessKeys;
 import com.juls.accesskeymanager.data.models.Status;
 import com.juls.accesskeymanager.data.repository.AccessKeyRepo;
-import com.juls.accesskeymanager.exceptions.ActiveAccessKeyException;
 import com.juls.accesskeymanager.exceptions.BadRequestException;
 
 @Service
@@ -36,7 +35,7 @@ public class AccessKeyService {
             detials.setProcured_date(keys.getProcuredDate());
             detials.setExpiry_date(keys.getExpiryDate());
             detials.setStatus(keys.getStatus());
-            detials.setEmail(this.userService.getUserEmailById(keys.getUserId()));
+            detials.setEmail(keys.getUser().getEmail());
             keyDetails.put(keys.getKeyId(), detials);
         });
 
@@ -44,7 +43,7 @@ public class AccessKeyService {
     }
 
     public List <AccessKeyDetails> getAllKeysByEmail(String email){
-        List <AccessKeys> accessKeys = this.accessKeyRepo.findByUserId(this.userService.getUserIdByEmail(email));
+        List <AccessKeys> accessKeys = this.accessKeyRepo.findByUser(this.userService.getUserByEmail(email));
         Map <Long, AccessKeyDetails> keyDetails = new HashMap<>();
         accessKeys.forEach(keys -> {
             AccessKeyDetails detials = new AccessKeyDetails();
@@ -52,7 +51,7 @@ public class AccessKeyService {
             detials.setProcured_date(keys.getProcuredDate());
             detials.setExpiry_date(keys.getExpiryDate());
             detials.setStatus(keys.getStatus());
-            detials.setEmail(this.userService.getUserEmailById(keys.getUserId()));
+            detials.setEmail(keys.getUser().getEmail());
             keyDetails.put(keys.getKeyId(), detials);
         });
 
@@ -70,6 +69,12 @@ public class AccessKeyService {
         return activeKey;
     }
 
+
+    /**
+     * This method revokes the access key of the user who's email has been selected
+     * @param email The email of the user 
+     * @return It saves the modified access key in the repository and returns the new one.
+     */
     public AccessKeys revokeKey(String email){
         AccessKeyDetails key = getActiveKeyByEmail(email);
         Optional <AccessKeys> accessKey = this.accessKeyRepo.findByKeyValue(key.getKeyValue());
@@ -77,6 +82,12 @@ public class AccessKeyService {
         return this.accessKeyRepo.save(accessKey.get());
     }
 
+    /**
+     * This method is used by the user to generate or request for a new access key. It first checks 
+     * whether the user has no active access key before it generates a new one for the user.
+     * @param email It takes a parameter of the email the user who wants to generate a new key.
+     * @return It returns a new generated access key for the user.
+     */
     private AccessKeys generatAccessKeys(String email){
         Date currentDate = new Date(System.currentTimeMillis());
         AccessKeys accessKey = new AccessKeys();
@@ -84,7 +95,7 @@ public class AccessKeyService {
         accessKey.setProcuredDate(currentDate);
         accessKey.setExpiryDate(calculateExpiryDate(currentDate));
         accessKey.setStatus(Status.ACTIVE);
-        accessKey.setUserId(this.userService.getUserIdByEmail(email));
+        accessKey.setUser(this.userService.getUserByEmail(email));
         return accessKey;
     }
 
@@ -103,7 +114,7 @@ public class AccessKeyService {
     private String keyValue (){
         String values = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrsquvwxyz1234567890";
         Random rand = new Random();
-        StringBuilder generatedValue = new StringBuilder();
+        StringBuilder generatedValue = new StringBuilder("");
          for (int i = 0; i < 10; i++){
             generatedValue.append(values.charAt(rand.nextInt(values.length())));
          }
@@ -112,8 +123,22 @@ public class AccessKeyService {
 
     private Date calculateExpiryDate(Date procuredDate){
         LocalDate currDate = procuredDate.toLocalDate();
-        LocalDate expiryDate = currDate.plusYears(1);
+        LocalDate expiryDate = currDate.plusDays(1);
         return Date.valueOf(expiryDate);
+    }
+
+    public void checkAndHandleExpiry(){
+        List <AccessKeys> accessKeyList = this.accessKeyRepo.findAll();
+        for (AccessKeys key : accessKeyList){
+            Date currDate = new Date(System.currentTimeMillis());
+            if (!key.getStatus().equals(Status.REVOKED)){
+                if (key.getExpiryDate().getTime()<= currDate.getTime()){
+                    key.setStatus(Status.EXPIRED);
+                    this.accessKeyRepo.save(key);
+                }
+            }
+        }
+
     }
 
 

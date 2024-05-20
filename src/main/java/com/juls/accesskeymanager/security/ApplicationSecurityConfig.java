@@ -9,39 +9,41 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.util.InMemoryResource;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.juls.accesskeymanager.services.UsersDetailsService;
 
+import lombok.RequiredArgsConstructor;
+
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class ApplicationSecurityConfig {
 
-    @Autowired
-    private UsersDetailsService userDetailsService;
+    
+    private final UsersDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/admin/").hasAuthority("ADMIN")
-                .requestMatchers("/users/").hasAuthority("USER")
+                .requestMatchers("/register/**").permitAll()
+                .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.loginPage("/login")
+                .formLogin(form -> form.loginPage("/public/login")
                 .permitAll())
                 .logout(logout -> logout.permitAll())
                 .authenticationManager(authenticationManager());
@@ -49,7 +51,6 @@ public class ApplicationSecurityConfig {
         return http.build();
     }
 
-    @SuppressWarnings({ "deprecation", "static-access" })
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -61,14 +62,6 @@ public class ApplicationSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder(){
-        @SuppressWarnings("deprecation")
-        PasswordEncoder encoder = NoOpPasswordEncoder.getInstance();
-        return encoder;
+        return new BCryptPasswordEncoder();
     }
-
-    @Bean
-    public UsersDetailsService userDetailsService(){
-        var usd = new InMemoryUserDetailsManager();
-        
-
 }

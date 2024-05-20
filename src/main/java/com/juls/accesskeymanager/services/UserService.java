@@ -1,12 +1,19 @@
 package com.juls.accesskeymanager.services;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
+import com.juls.accesskeymanager.data.models.AuthenticationRequest;
+import com.juls.accesskeymanager.data.models.Users;
 
-@Component
+
+
 public interface UserService{
     
-    public String getUserEmailById(Long id);
-
-    public Long getUserIdByEmail(String email);
+    Users getUserByEmail(String email);
+    Users registerUser (AuthenticationRequest authenticationRequest);
+    List <Users> getUsers();
+    String validateToken (String token);
+    
 }

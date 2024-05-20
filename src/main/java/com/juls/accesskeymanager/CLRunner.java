@@ -3,6 +3,7 @@ package com.juls.accesskeymanager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.List;
 
@@ -10,38 +11,37 @@ import com.juls.accesskeymanager.services.AccessKeyDetails;
 import com.juls.accesskeymanager.services.AccessKeyService;
 
 
+
 public class CLRunner implements CommandLineRunner {
 
     @Autowired
     private AccessKeyService accessKeyService;
 
-    private final String email = "reynolds@gmail.com";
+
 
     @Override
+    @Scheduled(fixedRate=60000)
     public void run(String... args) throws Exception{
 
 
-        List <AccessKeyDetails> keys = this.accessKeyService.getAllKeysByEmail(email);
+        List <AccessKeyDetails> keys = this.accessKeyService.getAllAccessKeys();
 
         keys.forEach(System.out::println);
 
         
-        System.out.println("ACTIVE KEYS");
+        System.out.println("RUNNING SCHEDULER");
         System.out.println("==============");
-        System.out.println(this.accessKeyService.getActiveKeyByEmail(email));
+        this.accessKeyService.checkAndHandleExpiry();
+    
         
 
         
         List <AccessKeyDetails> keyDetails = this.accessKeyService.getAllAccessKeys();
 
-        this.accessKeyService.revokeKey(email);
-        System.out.println("AFTER REVOKING");
+        System.out.println("AFTER RUNNING");
         System.out.println("================");
         keyDetails.forEach(System.out::println);
 
-        System.out.println();
-        System.out.println("GENERATING NEW KEY");
-        System.out.println(this.accessKeyService.generateKey(email));
     }
     
 }
