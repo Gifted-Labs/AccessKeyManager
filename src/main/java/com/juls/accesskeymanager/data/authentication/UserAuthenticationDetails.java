@@ -67,7 +67,7 @@ public class UserAuthenticationDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return this.isEnabled;
     }
 
     

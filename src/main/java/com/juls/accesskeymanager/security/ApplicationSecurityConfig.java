@@ -1,22 +1,14 @@
 package com.juls.accesskeymanager.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.juls.accesskeymanager.services.UsersDetailsService;
@@ -40,13 +32,15 @@ public class ApplicationSecurityConfig {
             .cors(cors -> cors.disable())
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/register/**").permitAll()
-                .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                .requestMatchers("/admin/**").hasAuthority("USER")
                 .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.loginPage("/public/login")
-                .permitAll())
+                .formLogin()
+                .permitAll()
+                .and()
                 .logout(logout -> logout.permitAll())
                 .authenticationManager(authenticationManager());
+
 
         return http.build();
     }
