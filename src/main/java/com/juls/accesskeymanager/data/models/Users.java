@@ -1,9 +1,5 @@
 package com.juls.accesskeymanager.data.models;
 
-import org.antlr.v4.runtime.misc.NotNull;
-import org.hibernate.annotations.NaturalId;
-
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -23,8 +19,10 @@ public class Users {
     @Column(name = "user_id")
     private Long userId;
 
+    @Column(name = "username")
+    private String username;
+
     @Column (name="email")
-    @NaturalId(mutable =true)
     private String email;
 
     @Column(name = "password")
@@ -33,8 +31,6 @@ public class Users {
     @Enumerated
     @Column(name ="role")
     private Role role; 
-
-    private boolean isEnabled = false;
 
 }
 

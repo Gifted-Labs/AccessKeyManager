@@ -5,32 +5,43 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+<<<<<<< HEAD
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+=======
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.User;
+>>>>>>> parent of 66409c8 (I implemented the authentication method, specifically the user registration and also modified the user table to include the is_enabled field and also created a table for the verificaiton token et all)
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+<<<<<<< HEAD
+=======
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.util.InMemoryResource;
+>>>>>>> parent of 66409c8 (I implemented the authentication method, specifically the user registration and also modified the user table to include the is_enabled field and also created a table for the verificaiton token et all)
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.juls.accesskeymanager.services.UsersDetailsService;
 
-import lombok.RequiredArgsConstructor;
-
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
+@EnableMethodSecurity(prePostEnabled = true)
 public class ApplicationSecurityConfig {
 
-    
-    private final UsersDetailsService userDetailsService;
+    @Autowired
+    private UsersDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.disable())
             .authorizeHttpRequests(authorize -> authorize
+<<<<<<< HEAD
                 .requestMatchers("/register/**").permitAll()
                 .requestMatchers("/admin/**").hasAuthority("USER")
                 .anyRequest().authenticated()
@@ -38,6 +49,14 @@ public class ApplicationSecurityConfig {
                 .formLogin()
                 .permitAll()
                 .and()
+=======
+                .requestMatchers("/admin/").hasAuthority("ADMIN")
+                .requestMatchers("/users/").hasAuthority("USER")
+                .anyRequest().authenticated()
+                )
+                .formLogin(form -> form.loginPage("/login")
+                .permitAll())
+>>>>>>> parent of 66409c8 (I implemented the authentication method, specifically the user registration and also modified the user table to include the is_enabled field and also created a table for the verificaiton token et all)
                 .logout(logout -> logout.permitAll())
                 .authenticationManager(authenticationManager());
 
@@ -45,6 +64,7 @@ public class ApplicationSecurityConfig {
         return http.build();
     }
 
+    @SuppressWarnings({ "deprecation", "static-access" })
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -56,6 +76,14 @@ public class ApplicationSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
+        @SuppressWarnings("deprecation")
+        PasswordEncoder encoder = NoOpPasswordEncoder.getInstance();
+        return encoder;
     }
+
+    @Bean
+    public UsersDetailsService userDetailsService(){
+        var usd = new InMemoryUserDetailsManager();
+        
+
 }
