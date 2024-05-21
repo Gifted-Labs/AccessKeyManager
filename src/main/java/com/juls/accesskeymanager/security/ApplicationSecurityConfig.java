@@ -43,7 +43,7 @@ public class ApplicationSecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
 <<<<<<< HEAD
                 .requestMatchers("/register/**").permitAll()
-                .requestMatchers("/admin/**").hasAuthority("USER")
+                .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .anyRequest().authenticated()
                 )
                 .formLogin()

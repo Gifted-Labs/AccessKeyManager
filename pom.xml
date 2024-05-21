@@ -11,6 +11,10 @@
 	<groupId>com.juls</groupId>
 	<artifactId>accesskeymanager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<modules>
+		<module>accesskeymanager</module>
+	</modules>
 	<name>accesskeymanager</name>
 	<description>Access Key Manager Service </description>
 	<properties>
