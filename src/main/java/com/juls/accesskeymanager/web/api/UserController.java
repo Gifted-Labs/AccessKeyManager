@@ -1,7 +1,7 @@
 package com.juls.accesskeymanager.web.api;
 
+import com.juls.accesskeymanager.data.models.AccessKeyDetails;
 import com.juls.accesskeymanager.data.models.AccessKeys;
-import com.juls.accesskeymanager.services.AccessKeyDetails;
 import com.juls.accesskeymanager.services.AccessKeyService;
 import com.juls.accesskeymanager.services.UserServiceImpl;
 

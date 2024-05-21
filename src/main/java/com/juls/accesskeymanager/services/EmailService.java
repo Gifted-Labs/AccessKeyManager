@@ -12,10 +12,9 @@ public class EmailService {
     
     private final JavaMailSender mailSender;
 
-    public void sendVerificationEmail(String to, String verificationTokenUrl){
+    public void sendVerificationEmail(String to, String url){
         String subject = "EMAIL VERIFICATION";
-        String  verificationUrl = verificationTokenUrl;
-        String message = "Please verify your account by clicking the following link : "+verificationUrl;
+        String message = "Please verify your account by clicking the following link : "+url;
     
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(to);

@@ -1,6 +1,4 @@
-package com.juls.accesskeymanager.services;
-
-import com.juls.accesskeymanager.data.models.Status;
+package com.juls.accesskeymanager.data.models;
 
 import java.sql.Date;
 

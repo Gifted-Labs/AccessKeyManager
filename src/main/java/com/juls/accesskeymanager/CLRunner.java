@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import com.juls.accesskeymanager.services.AccessKeyDetails;
+import com.juls.accesskeymanager.data.models.AccessKeyDetails;
 import com.juls.accesskeymanager.services.AccessKeyService;
 
 

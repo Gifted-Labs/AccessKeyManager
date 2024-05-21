@@ -19,9 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RegistrationCompleteEventListener implements ApplicationListener<RegistrationCompleteEvent> {
 
-
     private final UserServiceImpl userService;
     private final EmailService emailService;
+
+    private String url;
 
     @Override
     public void onApplicationEvent(RegistrationCompleteEvent event){
@@ -43,6 +44,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
 
         // 5. Send the email;
         log.info("Click on the link to veriy your account : {}",url);
+        emailService.sendVerificationEmail(user.getEmail(), url);
     }
     
 }

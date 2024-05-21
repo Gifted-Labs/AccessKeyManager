@@ -1,38 +1,35 @@
 package com.juls.accesskeymanager.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-<<<<<<< HEAD
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-=======
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
->>>>>>> parent of 66409c8 (I implemented the authentication method, specifically the user registration and also modified the user table to include the is_enabled field and also created a table for the verificaiton token et all)
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-<<<<<<< HEAD
-=======
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.util.InMemoryResource;
->>>>>>> parent of 66409c8 (I implemented the authentication method, specifically the user registration and also modified the user table to include the is_enabled field and also created a table for the verificaiton token et all)
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.juls.accesskeymanager.data.authentication.UserAuthenticationDetails;
+import com.juls.accesskeymanager.data.models.Users;
+import com.juls.accesskeymanager.services.UserServiceImpl;
 import com.juls.accesskeymanager.services.UsersDetailsService;
+
+import lombok.RequiredArgsConstructor;
 
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class ApplicationSecurityConfig {
 
-    @Autowired
+    private final UserServiceImpl userService;
     private UsersDetailsService userDetailsService;
 
     @Bean
@@ -41,22 +38,13 @@ public class ApplicationSecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-<<<<<<< HEAD
                 .requestMatchers("/register/**").permitAll()
-                .requestMatchers("/admin/**").hasAuthority("ADMIN")
+                .requestMatchers("/admin/").hasAuthority("ADMIN")
+                .requestMatchers("/users/**").hasAuthority("USER")
                 .anyRequest().authenticated()
                 )
                 .formLogin()
-                .permitAll()
-                .and()
-=======
-                .requestMatchers("/admin/").hasAuthority("ADMIN")
-                .requestMatchers("/users/").hasAuthority("USER")
-                .anyRequest().authenticated()
-                )
-                .formLogin(form -> form.loginPage("/login")
-                .permitAll())
->>>>>>> parent of 66409c8 (I implemented the authentication method, specifically the user registration and also modified the user table to include the is_enabled field and also created a table for the verificaiton token et all)
+                .permitAll().and()
                 .logout(logout -> logout.permitAll())
                 .authenticationManager(authenticationManager());
 
@@ -64,7 +52,6 @@ public class ApplicationSecurityConfig {
         return http.build();
     }
 
-    @SuppressWarnings({ "deprecation", "static-access" })
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -76,14 +63,18 @@ public class ApplicationSecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder(){
-        @SuppressWarnings("deprecation")
-        PasswordEncoder encoder = NoOpPasswordEncoder.getInstance();
-        return encoder;
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public UsersDetailsService userDetailsService(){
-        var usd = new InMemoryUserDetailsManager();
-        
+    public UserDetailsService userDetailsService(){
+        return email -> {
+            Users user =  this.userService.getUserByEmail(email);
+            if (user == null){
+                throw new UsernameNotFoundException("User not found with email "+email);
+            }
+            return new UserAuthenticationDetails(user);
+        };
+    }
 
 }

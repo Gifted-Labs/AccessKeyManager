@@ -1,5 +1,7 @@
 package com.juls.accesskeymanager.data.models;
 
+import org.hibernate.annotations.NaturalId;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
@@ -19,9 +21,7 @@ public class Users {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "username")
-    private String username;
-
+    @NaturalId(mutable = true)
     @Column (name="email")
     private String email;
 
@@ -32,6 +32,7 @@ public class Users {
     @Column(name ="role")
     private Role role; 
 
+    private boolean isEnabled = false;
 }
 
 
