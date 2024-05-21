@@ -32,7 +32,7 @@ public class ApplicationSecurityConfig {
             .cors(cors -> cors.disable())
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/register/**").permitAll()
-                .requestMatchers("/admin/**").hasAuthority("USER")
+                .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .anyRequest().authenticated()
                 )
                 .formLogin()
