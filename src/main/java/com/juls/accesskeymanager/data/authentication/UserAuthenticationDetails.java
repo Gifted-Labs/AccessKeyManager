@@ -1,6 +1,5 @@
 package com.juls.accesskeymanager.data.authentication;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -15,6 +14,7 @@ import com.juls.accesskeymanager.data.models.Users;
 public class UserAuthenticationDetails implements UserDetails {
 
     private String username;
+
     private String password;
     private boolean isEnabled;
     private  Collection <? extends GrantedAuthority> authorities;

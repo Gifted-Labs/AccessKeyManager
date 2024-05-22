@@ -22,10 +22,10 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
     private final UserServiceImpl userService;
     private final EmailService emailService;
 
-    private String url;
+
 
     @Override
-    public void onApplicationEvent(RegistrationCompleteEvent event){
+    public void onApplicationEvent(@SuppressWarnings("null") RegistrationCompleteEvent event){
             
         // 1. Get the newly registered user
         var user = event.getUser();

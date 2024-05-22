@@ -34,6 +34,7 @@ public class AdminController {
     @GetMapping("/generate")
     public String generateKey() throws BadRequestException{
         String email = "julius@yahoo.com";
+        @SuppressWarnings("unused")
         AccessKeys accessKey = this.accessKeyService.generateKey(email);
         return "redirect:/admin/dashboard";
     }

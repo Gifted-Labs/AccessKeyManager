@@ -16,7 +16,6 @@ import com.juls.accesskeymanager.data.models.AccessKeyDetails;
 import com.juls.accesskeymanager.data.models.AccessKeys;
 import com.juls.accesskeymanager.data.models.Status;
 import com.juls.accesskeymanager.data.repository.AccessKeyRepo;
-import com.juls.accesskeymanager.exceptions.ActiveAccessKeyException;
 import com.juls.accesskeymanager.exceptions.BadRequestException;
 
 @Service

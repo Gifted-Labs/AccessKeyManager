@@ -1,7 +1,5 @@
 package com.juls.accesskeymanager.controller;
 
-import java.util.List;
-
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.GetMapping;
