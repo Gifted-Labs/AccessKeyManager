@@ -1,6 +1,7 @@
 package com.juls.accesskeymanager.security;
 
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +11,15 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.juls.accesskeymanager.services.UsersDetailsService;
 
+import jakarta.websocket.OnClose;
 import lombok.RequiredArgsConstructor;
 
 
@@ -25,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ApplicationSecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+    private final UsersDetailsService userAuthDetailsService;
 
     @SuppressWarnings("removal")
     @Bean
@@ -35,7 +39,7 @@ public class ApplicationSecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/register/**").permitAll()
-                .requestMatchers("/admin/").hasAuthority("ADMIN")
+                .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/users/**").hasAuthority("USER")
                 .anyRequest().authenticated()
                 )
@@ -48,12 +52,14 @@ public class ApplicationSecurityConfig {
         return http.build();
     }
 
+
+
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
         authProvider.setPasswordEncoder(passwordEncoder());
-        authProvider.setUserDetailsService(this.userDetailsService);
+        authProvider.setUserDetailsService(this.userAuthDetailsService);
         return new ProviderManager(authProvider);
     }
 
@@ -62,6 +68,5 @@ public class ApplicationSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-   
 
 }

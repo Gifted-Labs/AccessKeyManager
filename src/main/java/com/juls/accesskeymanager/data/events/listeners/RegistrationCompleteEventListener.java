@@ -9,6 +9,7 @@ import com.juls.accesskeymanager.data.events.RegistrationCompleteEvent;
 import com.juls.accesskeymanager.services.EmailService;
 import com.juls.accesskeymanager.services.UserServiceImpl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +26,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
 
 
     @Override
+    @Transactional 
     public void onApplicationEvent(@SuppressWarnings("null") RegistrationCompleteEvent event){
             
         // 1. Get the newly registered user

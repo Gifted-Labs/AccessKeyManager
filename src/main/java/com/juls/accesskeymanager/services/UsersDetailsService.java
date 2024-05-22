@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.juls.accesskeymanager.data.authentication.UserAuthenticationDetails;
 import com.juls.accesskeymanager.data.models.Role;
 import com.juls.accesskeymanager.data.models.Users;
 import com.juls.accesskeymanager.data.repository.UserRepository;
@@ -24,7 +25,7 @@ public class UsersDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
         Users user = this.userRepository.findByEmail(email).orElseThrow( () -> new UsernameNotFoundException("User not found with email: "+ email));
-        return new org.springframework.security.core.userdetails.User(user.getEmail(),user.getPassword(),mapRolesToAuthorities(user.getRole()));
+        return new UserAuthenticationDetails(user);
     }
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Role role){

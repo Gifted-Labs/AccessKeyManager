@@ -10,7 +10,9 @@ import java.util.Random;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.juls.accesskeymanager.data.models.AccessKeyDetails;
 import com.juls.accesskeymanager.data.models.AccessKeys;
@@ -88,6 +90,7 @@ public class AccessKeyService {
         return accessKey;
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public AccessKeys generateKey(String email) throws BadRequestException{
         AccessKeys key = new AccessKeys();
         if (this.getActiveKeyByEmail(email)==null){
