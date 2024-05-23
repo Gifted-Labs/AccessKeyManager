@@ -3,27 +3,36 @@ package com.juls.accesskeymanager.services;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import javax.swing.text.html.Option;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.juls.accesskeymanager.data.models.AuthenticationRequest;
+import com.juls.accesskeymanager.data.models.ResetPasswordRequest;
 import com.juls.accesskeymanager.data.models.Users;
 import com.juls.accesskeymanager.data.repository.UserRepository;
 import com.juls.accesskeymanager.data.repository.VerificationTokenRepository;
 import com.juls.accesskeymanager.data.token.VerificationToken;
+import com.juls.accesskeymanager.exceptions.NotFoundException;
 import com.juls.accesskeymanager.exceptions.UserAlreadyExistsException;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService{
     
     @Autowired
     private UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenRepository verificationRepository;
+    private final EmailService emailService;
 
     
 
@@ -36,6 +45,8 @@ public class UserServiceImpl implements UserService{
         return this.userRepository.findAll();
     }
 
+
+
     public Users registerUser(AuthenticationRequest authenticationRequest) {
         Optional <Users> user = this.userRepository.findByEmail(authenticationRequest.email());
         if (user.isPresent()){
@@ -47,6 +58,25 @@ public class UserServiceImpl implements UserService{
         newUser.setRole(authenticationRequest.role());
         return this.userRepository.save(newUser);
     }
+
+    public Users getUserForReset(String email){
+        var user = new Users();
+        if (this.verifyUser(email)){
+            user = this.getUserByEmail(email);
+        }
+        return user;
+    }
+
+    public boolean verifyUser(String email){
+        boolean flag = false;
+        if(this.userRepository.findByEmail(email).isPresent()){
+            var user = this.userRepository.findByEmail(email).get();
+            if(user.isEnabled()){
+                flag = true;
+            }
+        }
+        return flag;
+    }    
 
 
     @Override
@@ -64,7 +94,40 @@ public class UserServiceImpl implements UserService{
         }
         user.setEnabled(true);
         this.userRepository.save(user);
+        this.verificationRepository.delete(verificationToken);
         return "valid";
+    }
+
+    public String validateResetToken(String token){
+        VerificationToken verificationToken = this.verificationRepository.findByToken(token);
+        if (verificationToken==null){
+            return "Invalid Verification Token";
+        }
+
+        var user = verificationToken.getUser();
+        Calendar calendar = Calendar.getInstance();
+        if((verificationToken.getExpirationTime().getTime() - calendar.getTime().getTime()<= 0)){
+            this.verificationRepository.delete(verificationToken);
+            return "Verification Token Expired";
+        }
+        this.verificationRepository.delete(verificationToken);
+        return "valid";
+    }
+
+
+    public void updatePassword(String password){
+        
+    }
+    
+    public String resetPasswordInit(String email, String url) throws NotFoundException{
+        
+        var user = this.getUserForReset(email);
+        String resetToken = UUID.randomUUID().toString();
+        this.saveVerificationToken(user, resetToken);
+        String resetUrl = url+"/register/resetPassword?token="+resetToken;
+        // emailService.sendVerificationEmail(email, resetUrl);
+        // log.info("This is the error {}");
+        return url+"/register/resetPassword?token="+resetToken;
     }
 
 

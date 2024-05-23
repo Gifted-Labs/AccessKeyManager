@@ -32,7 +32,8 @@ public class UserController {
 
     
 
-    @GetMapping("/generate")
+   
+   @GetMapping("/generate")
     public List <AccessKeyDetails> generateKey(Authentication authentication) throws BadRequestException{
         String email = authentication.getName();
         AccessKeys key = this.accessKeyService.generateKey(email);

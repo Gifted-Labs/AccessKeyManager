@@ -39,8 +39,9 @@ public class AdminController {
     }
 
     @GetMapping("/revoke")
-    public AccessKeys revokeAccessKey(@RequestParam(value="email") String email){
-        return this.accessKeyService.revokeKey(email);
+    public List <AccessKeyDetails> revokeAccessKey(@RequestParam(value="email") String email){
+        this.accessKeyService.revokeKey(email);
+        return this.accessKeyService.getAllAccessKeys();
     }
 
 

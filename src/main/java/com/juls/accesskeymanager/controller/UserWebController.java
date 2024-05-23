@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.juls.accesskeymanager.data.events.RegistrationCompleteEvent;
 import com.juls.accesskeymanager.data.models.AuthenticationRequest;
+import com.juls.accesskeymanager.data.models.Password;
 import com.juls.accesskeymanager.data.models.Users;
 import com.juls.accesskeymanager.data.token.VerificationToken;
+import com.juls.accesskeymanager.exceptions.NotFoundException;
 import com.juls.accesskeymanager.services.UserServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +28,7 @@ public class UserWebController {
     
     private final UserServiceImpl userService;
     private final ApplicationEventPublisher publisher;
+    private String email;
 
     @PostMapping
     public String registerUser(@RequestBody AuthenticationRequest authenticationRequest, final HttpServletRequest request){
@@ -54,7 +57,31 @@ public class UserWebController {
         return "Verification Failed";
 
     }
+
+    @PostMapping("/reset")
+    public String resetInit(@RequestParam(value = "email")String email, final HttpServletRequest request) throws NotFoundException{
+        return this.userService.resetPasswordInit(email, applicationUrl(request));
+    }
+
+    @PostMapping("/resetPassword")
+    public String resetPassword(@RequestParam(value="token") String token){
+        this.email = this.userService.getUserByEmail(token).getEmail();
+        if (this.userService.validateResetToken(token).equalsIgnoreCase("valid")){
+            return "redirect:/reset/update";
+        }
+        return null;
+    }
+
+    @PostMapping("/update")
+    public String updatePassword(){
+        return "Password updated successfully";
+    }
     
+    
+
+
+
+
     @GetMapping("/checkman")
     public String checkSomething(){
         return "I am checking something";

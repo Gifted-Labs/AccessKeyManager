@@ -3,6 +3,7 @@ package com.juls.accesskeymanager.data.models;
 import java.sql.Date;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -18,5 +19,11 @@ public class AccessKeyDetails {
     private String email;
 
 
+    // public AccessKeyDetails (AccessKeys keys){
+    //     this.keyValue = keys.getKeyValue();
+    //     this.procured_date =  keys.getProcuredDate();
+    //     this.expiry_date = keys.getExpiryDate();
+    //     this.email = keys.getUser().getEmail();
+    // }
     
 }

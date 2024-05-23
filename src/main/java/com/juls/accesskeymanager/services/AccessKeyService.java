@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,14 +18,14 @@ import com.juls.accesskeymanager.data.models.Status;
 import com.juls.accesskeymanager.data.repository.AccessKeyRepo;
 import com.juls.accesskeymanager.exceptions.BadRequestException;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AccessKeyService {
 
-    @Autowired
-    private AccessKeyRepo accessKeyRepo;
-    
-    @Autowired
-    private UserServiceImpl userService;
+    private final AccessKeyRepo accessKeyRepo;
+    private final UserServiceImpl userService;
 
     public List<AccessKeyDetails> getAllAccessKeys(){
         List <AccessKeys> accessKeys = this.accessKeyRepo.findAll();
@@ -76,7 +74,8 @@ public class AccessKeyService {
         AccessKeyDetails key = getActiveKeyByEmail(email);
         Optional <AccessKeys> accessKey = this.accessKeyRepo.findByKeyValue(key.getKeyValue());
         accessKey.get().setStatus(Status.REVOKED);
-        return this.accessKeyRepo.save(accessKey.get());
+        AccessKeys updatedKey = this.accessKeyRepo.save(accessKey.get());
+        return updatedKey;
     }
 
     private AccessKeys generatAccessKeys(String email){
