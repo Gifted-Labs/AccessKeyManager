@@ -1,7 +1,13 @@
 package com.juls.accesskeymanager.controller;
 
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,17 +70,25 @@ public class UserWebController {
     }
 
     @PostMapping("/resetPassword")
-    public String resetPassword(@RequestParam(value="token") String token){
-        this.email = this.userService.getUserByEmail(token).getEmail();
-        if (this.userService.validateResetToken(token).equalsIgnoreCase("valid")){
-            return "redirect:/reset/update";
+    public ResponseEntity<Void> resetPassword(@RequestParam(value="token") String token,@RequestBody Password password) throws URISyntaxException{
+        String validationStatus = this.userService.validateResetToken(token);
+        HttpHeaders headers = new HttpHeaders();
+        if ("valid".equalsIgnoreCase(validationStatus)){
+            URI uri = new URI("/register/update?password="+password.getMainPass()+"&token="+token);
+            headers.setLocation(uri);
+            return new ResponseEntity<>(headers,HttpStatus.FOUND);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("/update")
-    public String updatePassword(){
-        return "Password updated successfully";
+    
+    @GetMapping("/update")
+    public String updatePassword(@RequestParam("password")String password, @RequestParam("token") String token){
+        boolean isUpdated = this.userService.updatePassword(token, password);
+        if (isUpdated){
+            return "Password updated successfully. Login with your new password";
+        }
+        return null;
     }
     
     

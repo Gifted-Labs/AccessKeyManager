@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.juls.accesskeymanager.data.models.AuthenticationRequest;
+import com.juls.accesskeymanager.data.models.Password;
 import com.juls.accesskeymanager.data.models.ResetPasswordRequest;
 import com.juls.accesskeymanager.data.models.Users;
 import com.juls.accesskeymanager.data.repository.UserRepository;
@@ -43,6 +44,10 @@ public class UserServiceImpl implements UserService{
 
     public List <Users> getUsers() {
         return this.userRepository.findAll();
+    }
+
+    public Users getUserByToken(String token){
+        return verificationRepository.findByToken(token).getUser();
     }
 
 
@@ -110,13 +115,24 @@ public class UserServiceImpl implements UserService{
             this.verificationRepository.delete(verificationToken);
             return "Verification Token Expired";
         }
-        this.verificationRepository.delete(verificationToken);
         return "valid";
     }
-
-
-    public void updatePassword(String password){
-        
+    
+    
+    public boolean updatePassword(String token, String password){
+        boolean flag = false;
+        var user = this.getUserByToken(token);
+        if (user != null){
+            user.setPassword(this.passwordEncoder.encode(password));
+            this.userRepository.save(user);
+            this.verificationRepository.delete(this.verificationRepository.findByToken(token));
+            flag = true;
+        }
+        else{
+            flag = false;
+            throw new UsernameNotFoundException("Invalid token");
+        }
+        return flag;
     }
     
     public String resetPasswordInit(String email, String url) throws NotFoundException{
