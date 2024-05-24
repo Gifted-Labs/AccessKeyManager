@@ -141,7 +141,7 @@ public class UserServiceImpl implements UserService{
         String resetToken = UUID.randomUUID().toString();
         this.saveVerificationToken(user, resetToken);
         String resetUrl = url+"/register/resetPassword?token="+resetToken;
-        // emailService.sendVerificationEmail(email, resetUrl);
+        emailService.sendVerificationEmail(email, resetUrl);
         // log.info("This is the error {}");
         return url+"/register/resetPassword?token="+resetToken;
     }

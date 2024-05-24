@@ -70,11 +70,11 @@ public class UserWebController {
     }
 
     @PostMapping("/resetPassword")
-    public ResponseEntity<Void> resetPassword(@RequestParam(value="token") String token,@RequestBody Password password) throws URISyntaxException{
+    public ResponseEntity<Void> resetPassword(@RequestParam(value="token") String token,@RequestParam("password") String password) throws URISyntaxException{
         String validationStatus = this.userService.validateResetToken(token);
         HttpHeaders headers = new HttpHeaders();
         if ("valid".equalsIgnoreCase(validationStatus)){
-            URI uri = new URI("/register/update?password="+password.getMainPass()+"&token="+token);
+            URI uri = new URI("/register/update?password="+password+"&token="+token);
             headers.setLocation(uri);
             return new ResponseEntity<>(headers,HttpStatus.FOUND);
         }
