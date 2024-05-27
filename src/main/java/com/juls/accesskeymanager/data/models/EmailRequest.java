@@ -13,4 +13,9 @@ public class EmailRequest {
     
     private String reciepient;
     private String url;
+
+    public EmailRequest(String recipient, String url){
+        this.reciepient = recipient;
+        this.url = url;
+    }
 }

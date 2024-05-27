@@ -5,28 +5,30 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.swing.text.html.Option;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.juls.accesskeymanager.data.events.SendEmailEvent;
 import com.juls.accesskeymanager.data.models.AuthenticationRequest;
-import com.juls.accesskeymanager.data.models.Password;
-import com.juls.accesskeymanager.data.models.ResetPasswordRequest;
+import com.juls.accesskeymanager.data.models.EmailRequest;
 import com.juls.accesskeymanager.data.models.Users;
 import com.juls.accesskeymanager.data.repository.UserRepository;
 import com.juls.accesskeymanager.data.repository.VerificationTokenRepository;
 import com.juls.accesskeymanager.data.token.VerificationToken;
 import com.juls.accesskeymanager.exceptions.NotFoundException;
 import com.juls.accesskeymanager.exceptions.UserAlreadyExistsException;
+import org.springframework.context.ApplicationEventPublisher;
+
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UserServiceImpl implements UserService{
     
     @Autowired
@@ -34,6 +36,7 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenRepository verificationRepository;
     private final EmailService emailService;
+    private final ApplicationEventPublisher publisher;
 
     
 
@@ -96,9 +99,14 @@ public class UserServiceImpl implements UserService{
         if((verificationToken.getExpirationTime().getTime() - calendar.getTime().getTime()<= 0)){
             this.verificationRepository.delete(verificationToken);
             return "Verification Token Expired";
+
         }
         user.setEnabled(true);
         this.userRepository.save(user);
+        
+        EmailRequest emailRequest = new EmailRequest();
+        emailRequest.setReciepient(this.getUserByToken(token).getEmail());
+        this.publisher.publishEvent(new SendEmailEvent(emailRequest,"successRegister"));
         this.verificationRepository.delete(verificationToken);
         return "valid";
     }
@@ -141,8 +149,7 @@ public class UserServiceImpl implements UserService{
         String resetToken = UUID.randomUUID().toString();
         this.saveVerificationToken(user, resetToken);
         String resetUrl = url+"/register/resetPassword?token="+resetToken;
-        emailService.sendVerificationEmail(email, resetUrl);
-        // log.info("This is the error {}");
+        
         return url+"/register/resetPassword?token="+resetToken;
     }
 

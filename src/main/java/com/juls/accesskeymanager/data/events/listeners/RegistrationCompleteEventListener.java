@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import com.juls.accesskeymanager.data.events.RegistrationCompleteEvent;
+import com.juls.accesskeymanager.data.models.EmailRequest;
 import com.juls.accesskeymanager.services.EmailService;
 import com.juls.accesskeymanager.services.UserServiceImpl;
 
@@ -46,7 +47,8 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
 
         // 5. Send the email;
         log.info("Click on the link to veriy your account : {}",url);
-        emailService.sendVerificationEmail(user.getEmail(), url);
+        EmailRequest request = new EmailRequest(user.getEmail(),url);
+        emailService.sendVerificationEmail(request);
     }
     
 }

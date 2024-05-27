@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.juls.accesskeymanager.data.events.RegistrationCompleteEvent;
+import com.juls.accesskeymanager.data.events.SendEmailEvent;
 import com.juls.accesskeymanager.data.models.AuthenticationRequest;
-import com.juls.accesskeymanager.data.models.Password;
+import com.juls.accesskeymanager.data.models.EmailRequest;
 import com.juls.accesskeymanager.data.models.Users;
 import com.juls.accesskeymanager.data.token.VerificationToken;
 import com.juls.accesskeymanager.exceptions.NotFoundException;
@@ -65,8 +66,13 @@ public class UserWebController {
     }
 
     @PostMapping("/reset")
-    public String resetInit(@RequestParam(value = "email")String email, final HttpServletRequest request) throws NotFoundException{
-        return this.userService.resetPasswordInit(email, applicationUrl(request));
+    public ResponseEntity<String> resetInit(@RequestParam(value = "email")String email, final HttpServletRequest request) throws NotFoundException{
+        if (this.userService.getUserByEmail(email)==null){
+            return ResponseEntity.badRequest().body("User with email not found");
+        }
+        EmailRequest emailRequest = new EmailRequest(email, this.userService.resetPasswordInit(email, applicationUrl(request)));
+        this.publisher.publishEvent(new SendEmailEvent(emailRequest, "reset"));
+        return ResponseEntity.ok().body("Reset Request has been sent successfulyy");
     }
 
     @PostMapping("/resetPassword")
@@ -84,8 +90,12 @@ public class UserWebController {
     
     @GetMapping("/update")
     public String updatePassword(@RequestParam("password")String password, @RequestParam("token") String token){
+        String email = this.userService.getUserByToken(token).getEmail();
         boolean isUpdated = this.userService.updatePassword(token, password);
         if (isUpdated){
+            EmailRequest request = new EmailRequest();
+            request.setReciepient(email);
+            this.publisher.publishEvent(new SendEmailEvent(request, "successReset"));
             return "Password updated successfully. Login with your new password";
         }
         return null;
