@@ -36,6 +36,7 @@ public class ApplicationSecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/register/**").permitAll()
+                            .requestMatchers("/**.html").permitAll()
                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/users/**").hasAuthority("USER")
                 .anyRequest().authenticated()

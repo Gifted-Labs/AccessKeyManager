@@ -1,6 +1,7 @@
 package com.juls.accesskeymanager.data.events.listeners;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 
 import com.juls.accesskeymanager.data.events.SendEmailEvent;
@@ -12,8 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class SendEmailEventListener implements ApplicationListener<SendEmailEvent> {
-    
-    private final EmailService emailService;
+
+    @Autowired
+    private  EmailService emailService;
 
     @Override
     public void onApplicationEvent(SendEmailEvent event){

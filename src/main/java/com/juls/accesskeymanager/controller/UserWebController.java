@@ -40,7 +40,7 @@ public class UserWebController {
     @PostMapping
     public String registerUser(@RequestBody AuthenticationRequest authenticationRequest, final HttpServletRequest request){
         Users user = this.userService.registerUser(authenticationRequest);
-        this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request)));
+        // this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request)));
         return "User registered successfully";
     }
 

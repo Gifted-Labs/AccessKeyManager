@@ -1,12 +1,13 @@
 package com.juls.accesskeymanager.services;
 
+
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.juls.accesskeymanager.data.models.EmailRequest;
 
-import lombok.Data;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -14,6 +15,7 @@ import lombok.ToString;
 @Service
 @RequiredArgsConstructor
 public class EmailService {
+    
     private final JavaMailSender mailSender;
 
     public void sendVerificationEmail(EmailRequest request){

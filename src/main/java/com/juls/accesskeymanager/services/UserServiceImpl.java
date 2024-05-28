@@ -126,7 +126,6 @@ public class UserServiceImpl implements UserService{
         return "valid";
     }
     
-    
     public boolean updatePassword(String token, String password){
         boolean flag = false;
         var user = this.getUserByToken(token);
@@ -150,6 +149,7 @@ public class UserServiceImpl implements UserService{
         this.saveVerificationToken(user, resetToken);
         String resetUrl = url+"/register/resetPassword?token="+resetToken;
         
+
         return url+"/register/resetPassword?token="+resetToken;
     }
 
