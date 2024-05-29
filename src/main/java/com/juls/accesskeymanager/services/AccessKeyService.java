@@ -118,6 +118,13 @@ public class AccessKeyService {
         return Date.valueOf(expiryDate);
     }
 
+    public List <AccessKeys> getAllKeys(){
+        return this.accessKeyRepo.findAll();
+    }
+
+    public AccessKeys saveAccessKey(AccessKeys key){
+        return this.accessKeyRepo.save(key);
+    }
 
     
 }

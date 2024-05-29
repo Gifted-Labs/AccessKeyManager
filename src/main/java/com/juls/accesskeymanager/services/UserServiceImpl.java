@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.juls.accesskeymanager.data.events.SendEmailEvent;
 import com.juls.accesskeymanager.data.models.AuthenticationRequest;
 import com.juls.accesskeymanager.data.models.EmailRequest;
 import com.juls.accesskeymanager.data.models.Users;
@@ -22,7 +21,6 @@ import com.juls.accesskeymanager.data.token.VerificationToken;
 import com.juls.accesskeymanager.exceptions.BadRequestException;
 import com.juls.accesskeymanager.exceptions.NotFoundException;
 import com.juls.accesskeymanager.exceptions.UserAlreadyExistsException;
-import org.springframework.context.ApplicationEventPublisher;
 
 
 import lombok.RequiredArgsConstructor;
@@ -37,7 +35,6 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenRepository verificationRepository;
     private final EmailService emailService;
-    private final ApplicationEventPublisher publisher;
 
     
 
@@ -118,7 +115,6 @@ public class UserServiceImpl implements UserService{
             return "Invalid Verification Token";
         }
 
-        var user = verificationToken.getUser();
         Calendar calendar = Calendar.getInstance();
         if((verificationToken.getExpirationTime().getTime() - calendar.getTime().getTime()<= 0)){
             this.verificationRepository.delete(verificationToken);
@@ -128,6 +124,7 @@ public class UserServiceImpl implements UserService{
         return "valid";
     }
     
+
     public boolean updatePassword(String token, String password) throws BadRequestException{
         boolean flag = false;
         var user = this.getUserByToken(token);
@@ -135,7 +132,7 @@ public class UserServiceImpl implements UserService{
         if (!user.isEnabled()){
             throw new BadRequestException("This account is not verified");
         }
-        else if (user != null){
+        else {
             user.setPassword(this.passwordEncoder.encode(password));
             this.userRepository.save(user);
             this.verificationRepository.delete(this.verificationRepository.findByToken(token));
@@ -144,10 +141,6 @@ public class UserServiceImpl implements UserService{
             request.setReciepient(user.getEmail());
             this.emailService.sendResetSuccessEmail(request.getReciepient());
                 
-        }
-        else{
-            flag = false;
-            throw new UsernameNotFoundException("Invalid token");
         }
         return flag;
     }

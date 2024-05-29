@@ -40,7 +40,7 @@ public class UserController {
     public ResponseEntity<Void> generateKey(Authentication authentication) throws BadRequestException{
         try {
             String email = authentication.getName();
-            AccessKeys key = this.accessKeyService.generateKey(email);
+            this.accessKeyService.generateKey(email);
             HttpHeaders headers = new HttpHeaders();
             URI uri = new URI("/users/all");
             headers.setLocation(uri);
