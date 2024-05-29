@@ -3,7 +3,6 @@ package com.juls.accesskeymanager.data.models;
 import java.sql.Date;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 

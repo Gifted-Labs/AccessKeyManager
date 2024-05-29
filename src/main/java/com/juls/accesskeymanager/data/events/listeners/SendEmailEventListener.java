@@ -1,6 +1,7 @@
 package com.juls.accesskeymanager.data.events.listeners;
 
 
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 
@@ -19,6 +20,8 @@ public class SendEmailEventListener implements ApplicationListener<SendEmailEven
 
     @Override
     public void onApplicationEvent(SendEmailEvent event){
+
+        log.info("I am coming to send a message from the event listener");
         
         if (event.reason.equalsIgnoreCase("verification")){
             this.emailService.sendVerificationEmail(event.getRequest());

@@ -19,6 +19,7 @@ import com.juls.accesskeymanager.data.models.Users;
 import com.juls.accesskeymanager.data.repository.UserRepository;
 import com.juls.accesskeymanager.data.repository.VerificationTokenRepository;
 import com.juls.accesskeymanager.data.token.VerificationToken;
+import com.juls.accesskeymanager.exceptions.BadRequestException;
 import com.juls.accesskeymanager.exceptions.NotFoundException;
 import com.juls.accesskeymanager.exceptions.UserAlreadyExistsException;
 import org.springframework.context.ApplicationEventPublisher;
@@ -106,7 +107,7 @@ public class UserServiceImpl implements UserService{
         
         EmailRequest emailRequest = new EmailRequest();
         emailRequest.setReciepient(this.getUserByToken(token).getEmail());
-        this.publisher.publishEvent(new SendEmailEvent(emailRequest,"successRegister"));
+        this.emailService.sendResetSuccessEmail(emailRequest.getReciepient());
         this.verificationRepository.delete(verificationToken);
         return "valid";
     }
@@ -123,17 +124,26 @@ public class UserServiceImpl implements UserService{
             this.verificationRepository.delete(verificationToken);
             return "Verification Token Expired";
         }
+
         return "valid";
     }
     
-    public boolean updatePassword(String token, String password){
+    public boolean updatePassword(String token, String password) throws BadRequestException{
         boolean flag = false;
         var user = this.getUserByToken(token);
-        if (user != null){
+        
+        if (!user.isEnabled()){
+            throw new BadRequestException("This account is not verified");
+        }
+        else if (user != null){
             user.setPassword(this.passwordEncoder.encode(password));
             this.userRepository.save(user);
             this.verificationRepository.delete(this.verificationRepository.findByToken(token));
             flag = true;
+            EmailRequest request = new EmailRequest();
+            request.setReciepient(user.getEmail());
+            this.emailService.sendResetSuccessEmail(request.getReciepient());
+                
         }
         else{
             flag = false;
@@ -145,12 +155,15 @@ public class UserServiceImpl implements UserService{
     public String resetPasswordInit(String email, String url) throws NotFoundException{
         
         var user = this.getUserForReset(email);
+        if (user==null){
+            throw new UsernameNotFoundException("The user with email {} not found");
+        }
         String resetToken = UUID.randomUUID().toString();
         this.saveVerificationToken(user, resetToken);
-        String resetUrl = url+"/register/resetPassword?token="+resetToken;
-        
-
-        return url+"/register/resetPassword?token="+resetToken;
+        String resetLink = url+"/register/resetPassword?token="+resetToken;
+        EmailRequest emailRequest = new EmailRequest(email, resetLink);
+        this.emailService.sendResetTokenEmail(emailRequest);
+        return resetLink;
     }
 
 

@@ -22,12 +22,14 @@ import com.juls.accesskeymanager.data.models.EmailRequest;
 import com.juls.accesskeymanager.data.models.Users;
 import com.juls.accesskeymanager.data.token.VerificationToken;
 import com.juls.accesskeymanager.exceptions.NotFoundException;
+import com.juls.accesskeymanager.services.EmailService;
 import com.juls.accesskeymanager.services.UserServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/register")
 @RequiredArgsConstructor
@@ -35,13 +37,22 @@ public class UserWebController {
     
     private final UserServiceImpl userService;
     private final ApplicationEventPublisher publisher;
-    private String email;
+    private final EmailService emailService;
+    
 
     @PostMapping
-    public String registerUser(@RequestBody AuthenticationRequest authenticationRequest, final HttpServletRequest request){
-        Users user = this.userService.registerUser(authenticationRequest);
-        // this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request)));
-        return "User registered successfully";
+    public ResponseEntity<String> registerUser(@RequestBody AuthenticationRequest authenticationRequest, final HttpServletRequest request){
+        try {
+            Users user = this.userService.registerUser(authenticationRequest);
+            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request))); 
+            new ResponseEntity<>(HttpStatus.ACCEPTED);
+            return ResponseEntity.ok("User registered successfully"); 
+        } catch (Exception e) {
+            log.debug(e.getMessage());      
+            new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+        // return null;
     }
 
     private String applicationUrl(HttpServletRequest request){
@@ -49,31 +60,39 @@ public class UserWebController {
         return url;
     }
 
-    @PostMapping("/verifyEmail")
-    public String verifyEmail(@RequestParam(value = "token") String token){
-        VerificationToken verificationToken = this.userService.findToken(token);
-        if(verificationToken.getUser().isEnabled()){
-            return "User is already verified! Please login";
+    @SuppressWarnings({ "static-access", "finally" })
+    @PostMapping("/verifyuser")
+    public ResponseEntity<String> verifyUser(@RequestParam(value = "token") String token){
+        try {
+            VerificationToken verificationToken = this.userService.findToken(token);
+            if(verificationToken.getUser().isEnabled()){
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN).badRequest().body("User is already verified! Please login");
+            }
+            String verificationResult = this.userService.validateToken(token);
+            if (verificationResult.equalsIgnoreCase("valid")){
+                new ResponseEntity<>(HttpStatus.OK);
+                return ResponseEntity.ok().body("Email verification successful. Please Login");
+            }            
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST).badRequest().body(e.getMessage());   
         }
-
-        String verificationResult = this.userService.validateToken(token);
-        if (verificationResult.equalsIgnoreCase("valid")){
-            return "Email verification successful. Please Login";
-        }
-
-        return "Verification Failed";
-
+        return null;
     }
 
     @PostMapping("/reset")
     public ResponseEntity<String> resetInit(@RequestParam(value = "email")String email, final HttpServletRequest request) throws NotFoundException{
-        if (this.userService.getUserByEmail(email)==null){
-            return ResponseEntity.badRequest().body("User with email not found");
+        try {
+            String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request));
+            log.info("Click on the following link to reset your password: {}",resetLink);
+            return ResponseEntity.ok().body("Reset Request has been sent to your email successfulyy");
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND).badRequest().body(e.getMessage());
         }
-        EmailRequest emailRequest = new EmailRequest(email, this.userService.resetPasswordInit(email, applicationUrl(request)));
-        this.publisher.publishEvent(new SendEmailEvent(emailRequest, "reset"));
-        return ResponseEntity.ok().body("Reset Request has been sent successfulyy");
-    }
+        
+        }
+    
 
     @PostMapping("/resetPassword")
     public ResponseEntity<Void> resetPassword(@RequestParam(value="token") String token,@RequestParam("password") String password) throws URISyntaxException{
@@ -89,24 +108,23 @@ public class UserWebController {
 
     
     @GetMapping("/update")
-    public String updatePassword(@RequestParam("password")String password, @RequestParam("token") String token){
-        String email = this.userService.getUserByToken(token).getEmail();
-        boolean isUpdated = this.userService.updatePassword(token, password);
-        if (isUpdated){
-            EmailRequest request = new EmailRequest();
-            request.setReciepient(email);
-            this.publisher.publishEvent(new SendEmailEvent(request, "successReset"));
-            return "Password updated successfully. Login with your new password";
+    public ResponseEntity<String> updatePassword(@RequestParam("password")String password, @RequestParam("token") String token){
+        try {
+            String email = this.userService.getUserByToken(token).getEmail();
+            boolean isUpdated = this.userService.updatePassword(token, password);
+            if (isUpdated){
+                new ResponseEntity<>(HttpStatus.OK);
+                return ResponseEntity.ok().body("Password updated successfully. Login with your new password");
+            }
+        } catch (Exception e) {
+            log.debug(e.getMessage());
+            new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
         return null;
     }
     
-    
-
-
-
-
-    @GetMapping("/checkman")
+    @PostMapping("/resendToken")
     public String checkSomething(){
         return "I am checking something";
     }
