@@ -13,7 +13,9 @@ import com.juls.accesskeymanager.data.token.VerificationToken;
 import com.juls.accesskeymanager.services.AccessKeyService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ExpiryDateHandler {
@@ -26,11 +28,15 @@ public class ExpiryDateHandler {
         List <AccessKeys> allKeys = this.accessKeyService.getAllKeys();
         for (AccessKeys key : allKeys){
             Calendar calendar = Calendar.getInstance();
-            if (key.getExpiryDate().getTime() - calendar.getTime().getTime() <= 0){
-                key.setStatus(Status.EXPIRED);
-                this.accessKeyService.saveAccessKey(key);
+            if (key.getStatus()!=Status.REVOKED){
+
+                if (key.getExpiryDate().getTime() - calendar.getTime().getTime() <= 0){
+                    key.setStatus(Status.EXPIRED);
+                    this.accessKeyService.saveAccessKey(key);
+                }
             }
         }
+        log.info("All expired keys updated");
     }
 
     @Scheduled(fixedRate=900000)
@@ -42,5 +48,6 @@ public class ExpiryDateHandler {
                 this.verificationTokenRepository.delete(token);
             }
         });
+        log.info("All Expired tokens deleted");
     }
 }

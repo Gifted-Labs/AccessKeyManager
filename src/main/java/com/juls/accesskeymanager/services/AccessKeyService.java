@@ -70,9 +70,12 @@ public class AccessKeyService {
         return activeKey;
     }
 
-    public AccessKeys revokeKey(String email){
+    public AccessKeys revokeKey(String email) throws BadRequestException{
         AccessKeyDetails key = getActiveKeyByEmail(email);
         Optional <AccessKeys> accessKey = this.accessKeyRepo.findByKeyValue(key.getKeyValue());
+        if (accessKey.get().getStatus()==Status.EXPIRED || accessKey.get().getStatus()==Status.REVOKED){
+            throw new BadRequestException("You cannot revoke this key");
+        }
         accessKey.get().setStatus(Status.REVOKED);
         AccessKeys updatedKey = this.accessKeyRepo.save(accessKey.get());
         return updatedKey;

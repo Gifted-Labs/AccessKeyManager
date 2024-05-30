@@ -65,6 +65,15 @@ public class UserServiceImpl implements UserService{
         return this.userRepository.save(newUser);
     }
 
+    public Users checkUser(String email){
+        Optional <Users> user = this.userRepository.findByEmail(email);
+        var user1 = new Users();
+        if (user.isPresent() && !user.get().isEnabled()){
+            user1 = user.get();
+        }
+        return user1;
+    }
+
     public Users getUserForReset(String email){
         var user = new Users();
         if (this.verifyUser(email)){
@@ -73,16 +82,23 @@ public class UserServiceImpl implements UserService{
         return user;
     }
 
+
+
     public boolean verifyUser(String email){
         boolean flag = false;
         if(this.userRepository.findByEmail(email).isPresent()){
             var user = this.userRepository.findByEmail(email).get();
             if(user.isEnabled()){
+                if (verificationRepository.findByUser(user)!=null){
+                    
+                }
                 flag = true;
             }
         }
         return flag;
     }    
+
+
 
 
     @Override
@@ -169,5 +185,6 @@ public class UserServiceImpl implements UserService{
         VerificationToken theToken = this.verificationRepository.findByToken(token);
         return theToken;
     }
+
     
 }

@@ -16,13 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.juls.accesskeymanager.data.events.RegistrationCompleteEvent;
-import com.juls.accesskeymanager.data.events.SendEmailEvent;
 import com.juls.accesskeymanager.data.models.AuthenticationRequest;
-import com.juls.accesskeymanager.data.models.EmailRequest;
 import com.juls.accesskeymanager.data.models.Users;
 import com.juls.accesskeymanager.data.token.VerificationToken;
 import com.juls.accesskeymanager.exceptions.NotFoundException;
-import com.juls.accesskeymanager.services.EmailService;
 import com.juls.accesskeymanager.services.UserServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +34,6 @@ public class UserWebController {
     
     private final UserServiceImpl userService;
     private final ApplicationEventPublisher publisher;
-    private final EmailService emailService;
     
 
     @PostMapping
@@ -49,24 +45,56 @@ public class UserWebController {
             return ResponseEntity.ok("User registered successfully"); 
         } catch (Exception e) {
             log.debug(e.getMessage());      
-            new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        // return null;
     }
+
+    @PostMapping("/resendVerification")
+    public ResponseEntity<String> resendVerificationToken(@RequestParam("email") String email, final HttpServletRequest request){
+        try {
+            var user = this.userService.checkUser(email);
+            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request)));
+            new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok("Token has been resent to your email");
+        }
+        catch (Exception e){
+            log.info(e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/resendreset")
+        public ResponseEntity<String> resendReset(@RequestParam(value = "email")String email, final HttpServletRequest request) throws NotFoundException{
+            try {
+                if (this.userService.verifyUser(email)){
+                String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request));
+                log.info("Click on the following link to reset your password: {}",resetLink);
+                return ResponseEntity.ok().body("Reset Request has been sent to your email successfulyy");
+            }
+                else {
+                    return ResponseEntity.badRequest().body("User does not exit");
+                }
+
+            } catch (Exception e) {
+                log.debug(e.getMessage());
+                return ResponseEntity.badRequest().body(e.getMessage());
+            }
+                 
+            }
+    
 
     private String applicationUrl(HttpServletRequest request){
         String url = String.format("http://%s:%s%s",request.getServerName(),request.getServerPort(),request.getContextPath());
         return url;
     }
 
-    @SuppressWarnings({ "static-access", "finally" })
+    @SuppressWarnings({ "static-access"})
     @PostMapping("/verifyuser")
     public ResponseEntity<String> verifyUser(@RequestParam(value = "token") String token){
         try {
             VerificationToken verificationToken = this.userService.findToken(token);
             if(verificationToken.getUser().isEnabled()){
-                return new ResponseEntity<>(HttpStatus.FORBIDDEN).badRequest().body("User is already verified! Please login");
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);                
             }
             String verificationResult = this.userService.validateToken(token);
             if (verificationResult.equalsIgnoreCase("valid")){
@@ -88,9 +116,9 @@ public class UserWebController {
             return ResponseEntity.ok().body("Reset Request has been sent to your email successfulyy");
         } catch (Exception e) {
             log.debug(e.getMessage());
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND).badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
-        
+             
         }
     
 
