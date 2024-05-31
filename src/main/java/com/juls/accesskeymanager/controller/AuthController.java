@@ -44,7 +44,7 @@ public class AuthController {
      */
 
     
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody AuthenticationRequest authenticationRequest, final HttpServletRequest request){
         try {
             Users user = this.userService.registerUser(authenticationRequest);

@@ -48,7 +48,7 @@ public class ApplicationSecurityConfig {
                 .requestMatchers("/api/users/**").hasAuthority("USER")
                 .anyRequest().authenticated()
                 )
-                .formLogin().loginPage("/public/login")
+                .formLogin()
                 .permitAll().and()
                 .logout(logout -> logout.permitAll())
                 .authenticationManager(authenticationManager());
