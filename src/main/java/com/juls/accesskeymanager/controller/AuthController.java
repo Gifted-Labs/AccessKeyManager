@@ -28,14 +28,22 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/register")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class UserWebController {
+public class AuthController {
     
     private final UserServiceImpl userService;
     private final ApplicationEventPublisher publisher;
     
 
+    
+    /** 
+     * @param authenticationRequest
+     * @param request
+     * @return ResponseEntity<String>
+     */
+
+    
     @PostMapping
     public ResponseEntity<String> registerUser(@RequestBody AuthenticationRequest authenticationRequest, final HttpServletRequest request){
         try {

@@ -20,12 +20,16 @@ import com.juls.accesskeymanager.data.models.AccessKeyDetails;
 
 @Slf4j
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 public class AdminController {
     
     @Autowired
     private AccessKeyService accessKeyService;
 
+    
+    /** 
+     * @return ResponseEntity<List<AccessKeyDetails>>
+     */
     @GetMapping("/dashboard")
     public ResponseEntity<List <AccessKeyDetails>> dashboard(){
             List <AccessKeyDetails> keyDetails = this.accessKeyService.getAllAccessKeys();

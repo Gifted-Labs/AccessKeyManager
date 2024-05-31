@@ -44,6 +44,10 @@ public class VerificationToken {
 
     private static final int EXPIRATIONTIME = 20;
 
+     
+     /** 
+      * @return Date
+      */
      // A method that handles the calculation of the expiration time.
      protected Date getTokenExpirationTime(){
         Calendar calendar = Calendar.getInstance();

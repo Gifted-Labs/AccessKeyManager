@@ -28,6 +28,12 @@ public class ApplicationSecurityConfig {
 
     private final UsersDetailsService userAuthDetailsService;
 
+    
+    /** 
+     * @param http
+     * @return SecurityFilterChain
+     * @throws Exception
+     */
     @SuppressWarnings("removal")
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
@@ -35,13 +41,14 @@ public class ApplicationSecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/register/**").permitAll()
-                            .requestMatchers("/**.html").permitAll()
-                .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                .requestMatchers("/users/**").hasAuthority("USER")
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/**.html").permitAll()
+                .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                .requestMatchers("/api/users/**").hasAuthority("USER")
                 .anyRequest().authenticated()
                 )
-                .formLogin()
+                .formLogin().loginPage("/public/login")
                 .permitAll().and()
                 .logout(logout -> logout.permitAll())
                 .authenticationManager(authenticationManager());

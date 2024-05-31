@@ -18,6 +18,10 @@ public class EmailService {
     
     private final JavaMailSender mailSender;
 
+    
+    /** 
+     * @param request
+     */
     public void sendVerificationEmail(EmailRequest request){
         VerificationMessage verify = new VerificationMessage(request.getUrl());
     

@@ -1,36 +1,53 @@
 <!DOCTYPE html>
-    <html lang="en" xmlns:th="http://www.thymeleaf.org">
-        <head>
-            <meta charset="UTF-8">
-            <title>USERNAME</title>
-        </head>
-        <body>
-            
-          
-            <hr />
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MICROFOCUS INC</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">MyApp</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/logout}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
 
-            <table border="1">
-                <thead>
-                    <th>Email</th>
-                    <th>Access Key</th>
-                    <th>Procured Date</th>
-                    <th>Expiry Date</th>
-                    <th>Status</th>
-                </thead>
+    <div class="container mt-4">
+        <h2>Admin Dashboard</h2>
+        <div class="form-group">
+            <input type="text" class="form-control" id="search" placeholder="Search by user's email">
+            <button class="btn btn-primary mt-2" onclick="searchKey()">Search</button>
+        </div>
+        <div id="search-result" class="alert alert-info mt-2" style="display: none;"></div>
+        <div class="row" id="keys-container">
+            <!-- Example Card -->
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Key Value: 123456</h5>
+                        <p class="card-text">Email: user@example.com</p>
+                        <p class="card-text">Status: Active</p>
+                        <p class="card-text">Created: 2023-01-01</p>
+                        <p class="card-text">Expires: 2023-12-31</p>
+                        <button class="btn btn-danger" onclick="revokeKey('123456')">Revoke</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <tbody>
-                    <tr>
-                        <td th:text= "${key.email}">Email</td>
-                        <td th:text= "${key.keyValue}">Access Key</td>
-                        <td th:text= "${key.procured_date}">Procured Date</td>
-                        <td th:text= "${key.expiry_date}">Expiry Date</td>
-                        <td th:text= "${key.status}">Status</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <hr />
-            <a href="#" th:href="@{/web/generate}">Generate</a>
-        </body>
-
-    </html>
+    <script th:src="@{https://code.jquery.com/jquery-3.2.1.slim.min.js}"></script>
+    <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js}"></script>
+    <script th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

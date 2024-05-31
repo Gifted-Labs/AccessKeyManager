@@ -29,6 +29,11 @@ public class UserAuthenticationDetails implements UserDetails {
     }
 
 
+    
+    /** 
+     * @param role
+     * @return Collection<? extends GrantedAuthority>
+     */
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Role role){
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }

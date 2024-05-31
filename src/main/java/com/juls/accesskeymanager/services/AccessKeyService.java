@@ -27,6 +27,10 @@ public class AccessKeyService {
     private final AccessKeyRepo accessKeyRepo;
     private final UserServiceImpl userService;
 
+    
+    /** 
+     * @return List<AccessKeyDetails>
+     */
     public List<AccessKeyDetails> getAllAccessKeys(){
         List <AccessKeys> accessKeys = this.accessKeyRepo.findAll();
         Map <Long, AccessKeyDetails> keyDetails = new HashMap<>();

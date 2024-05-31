@@ -38,6 +38,11 @@ public class UserServiceImpl implements UserService{
 
     
 
+    
+    /** 
+     * @param email
+     * @return Users
+     */
     @Override
     public Users getUserByEmail(String email){
         return this.userRepository.findByEmail(email).get();
@@ -119,7 +124,7 @@ public class UserServiceImpl implements UserService{
         this.userRepository.save(user);
         
         EmailRequest emailRequest = new EmailRequest();
-        emailRequest.setReciepient(this.getUserByToken(token).getEmail());
+        emailRequest.setReciepient(this.getUserByToken(token).getEmail());  
         this.emailService.sendResetSuccessEmail(emailRequest.getReciepient());
         this.verificationRepository.delete(verificationToken);
         return "valid";

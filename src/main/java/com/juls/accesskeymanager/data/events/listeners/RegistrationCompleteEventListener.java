@@ -26,6 +26,10 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
 
 
 
+    
+    /** 
+     * @param event
+     */
     @Override
     @Transactional 
     public void onApplicationEvent(@SuppressWarnings("null") RegistrationCompleteEvent event){

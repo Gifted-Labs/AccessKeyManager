@@ -22,6 +22,12 @@ public class UsersDetailsService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    
+    /** 
+     * @param email
+     * @return UserDetails
+     * @throws UsernameNotFoundException
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
         Users user = this.userRepository.findByEmail(email).orElseThrow( () -> new UsernameNotFoundException("User not found with email: "+ email));
