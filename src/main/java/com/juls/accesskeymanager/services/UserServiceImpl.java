@@ -6,8 +6,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,6 +38,7 @@ import lombok.RequiredArgsConstructor;
  * @since 2024
  */
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
@@ -43,8 +48,25 @@ public class UserServiceImpl implements UserService{
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenRepository verificationRepository;
     private final EmailService emailService;
+    private final AuthenticationManager authenticationManager;
 
-    
+
+    public boolean authenticatedUser(String username, String password) throws BadRequestException {
+        boolean flag = false;
+        try{
+            log.info("Starting authentication...");
+            //Authenticate the user using the AuthenticationManager
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            //If the authentication is successful, set the authentication object in the security contest.
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            log.info("Authentication done");
+            flag= true;
+        }
+        catch (Exception e){
+            throw new BadRequestException(e.getLocalizedMessage());
+        }
+        return flag;
+    }
 
     
     /** The getUserByEmail method is used to fetch a user entity from the database.

@@ -47,3 +47,8 @@ form.onsubmit = (e)=>{
     window.location.href = form.getAttribute("action"); //redirecting user to the specified url which is inside action attribute of form tag
   }
 }
+
+function showSomething(){
+    alert("Hello USER from js");
+
+}

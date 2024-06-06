@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,38 +42,28 @@ public class WebController {
     public final UserServiceImpl userService;
     public final AccessKeyService accessKeyService;
     public final ApplicationEventPublisher publisher;
-    // private final AuthenticationManager authenticationManager;
+     private final AuthenticationManager authenticationManager;
 
     @GetMapping("/login")
     public String getLoginPage(){
         return "login";
     }
 
-    // @PostMapping("/login")
-    // public String processLogin(@RequestParam("username") String username, @RequestParam("password") String password, HttpServletRequest request, Model model){
-    //     try {
-    //         log.info("Starting authentication...");
-    //         //Authenticate the user using the AuthenticationManager
-    //         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-
-    //         //If the authentication is successful, set the authentication object in the security contest.
-    //         SecurityContextHolder.getContext().setAuthentication(authentication);
-    //         String role = this.userService.getRole(authentication.getName());
-    //         log.info("Authentication done");
-    //         if (role.equalsIgnoreCase("user")){
-    //             return "redirect:/web/users";
-    //         }
-    //         else if(role.equalsIgnoreCase("admin")){
-    //             return "redirect:/web/admin/dashboard";
-    //         }
-    //         return null;
-
-    //     } catch (Exception e) {
-    //         log.info("Error info : {}", e.getMessage());
-    //         model.addAttribute("error", e.getMessage());
-    //         return "error";
-    //     }
-    // }
+//     @PostMapping("/login")
+//     public String processLogin(@RequestParam("username") String username, @RequestParam("password") String password, HttpServletRequest request, Model model){
+//         try {
+//
+//             if (this.userService.authenticatedUser(username,password)){
+//                 return "redirect:/public/redirect";
+//             }
+//             return null;
+//
+//         } catch (Exception e) {
+//             log.info("Error info : {}", e.getMessage());
+//             model.addAttribute("error", e.getMessage());
+//             return "error";
+//         }
+//     }
 
     
 
@@ -115,7 +106,7 @@ public class WebController {
                 return "success-registration";
             }
             else
-                return "auth";
+                return "login";
         } catch (Exception e) {
             log.info("User already: {}",e.getMessage());
             model.addAttribute("error", e.getMessage());
@@ -174,13 +165,10 @@ public class WebController {
     public String redirect(Authentication authentication, Model model){
         try {
             String role = this.userService.getRole(authentication.getName());
-            if (role.equalsIgnoreCase("user")){
-                return "redirect:/web/users";
-            }
-            else if(role.equalsIgnoreCase("admin")){
+            if (role.equalsIgnoreCase("admin")){
                 return "redirect:/web/admin/dashboard";
             }
-            return null;
+            return "redirect:/web/users";
 
         } catch (Exception e) {
             model.addAttribute("error", e.getLocalizedMessage());
