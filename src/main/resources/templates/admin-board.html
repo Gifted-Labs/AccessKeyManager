@@ -1,14 +1,18 @@
+
+
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MICROFOCUS INC</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" th:href="@{/css/adminstyle.css}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">MyApp</a>
+        <a class="navbar-brand" href="#">ACCESS KEY MANAGER</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -16,7 +20,7 @@
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" th:href="@{/logout}">Logout</a>
-                </li>
+                </li>a      
             </ul>
         </div>
     </nav>
@@ -24,26 +28,34 @@
     <div class="container mt-4">
         <h2>Admin Dashboard</h2>
         <div class="form-group">
-            <input type="text" class="form-control" id="search" placeholder="Search by user's email">
-            <button class="btn btn-primary mt-2" onclick="searchKey()">Search</button>
+            <form action="" th:action="@{/web/admin/search}" method="get">
+                <input type="text" class="search" name="search" placeholder="Search Active Key by Email...">
+                <button class="btn btn-primary mt-2">Search</button>
+            </form>
         </div>
         <div id="search-result" class="alert alert-info mt-2" style="display: none;"></div>
         <div class="row" id="keys-container">
-            <!-- Example Card -->
-            <div class="col-md-4 mb-3">
+            <!-- Card Layout -->
+            <div class="col-md-6 mb-4" th:each="key : ${keys}">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Key Value: 123456</h5>
-                        <p class="card-text">Email: user@example.com</p>
-                        <p class="card-text">Status: Active</p>
-                        <p class="card-text">Created: 2023-01-01</p>
-                        <p class="card-text">Expires: 2023-12-31</p>
-                        <button class="btn btn-danger" onclick="revokeKey('123456')">Revoke</button>
+                        <h5 class="card-title" th:text="${key.email}">Email</h5>
+                        <p class="card-text">
+                            <strong>Access Key:</strong> <span th:text="${key.keyValue}">Access Key</span><br>
+                            <strong>Procured Date:</strong> <span th:text="${key.procured_date}">Procured Date</span><br>
+                            <strong>Expiry Date:</strong> <span th:text="${key.expiry_date}">Expiry Date</span><br>
+                            <strong>Status:</strong> <span th:text="${key.status}">Status</span>
+                        </p>
+                        <a th:href="@{/web/admin/revoke(email=${key.email})}" href="#" class="btn btn-danger btn-sm revoke-btn" >Revoke</a>
                     </div>
                 </div>
             </div>
         </div>
+
+    
     </div>
+
+
 
     <script th:src="@{https://code.jquery.com/jquery-3.2.1.slim.min.js}"></script>
     <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js}"></script>

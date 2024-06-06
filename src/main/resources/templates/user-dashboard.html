@@ -1,39 +1,33 @@
-<!DOCTYPE html>
-    <html lang="en" xmlns:th="http://www.thymeleaf.org">
-        <head>
-            <meta charset="UTF-8">
-            <title>USERNAME</title>
-        </head>
-        <body>
-            <form action="#" th:action=" @{/web/search}" method="get">
-                <input type="search" name="search" id="search">
-                <input type="submit" value="Search">
-            </form>
 
-            <hr />
 
-            <table border="1">
-                <thead>
-                    <th>Email</th>
-                    <th>Access Key</th>
-                    <th>Procured Date</th>
-                    <th>Expiry Date</th>
-                    <th>Status</th>
-                </thead>
 
-                <tbody>
-                    <tr th:each = "key : ${keys}">
-                        <td th:text= "${key.email}">Email</td>
-                        <td th:text= "${key.keyValue}">Access Key</td>
-                        <td th:text= "${key.procured_date}">Procured Date</td>
-                        <td th:text= "${key.expiry_date}">Expiry Date</td>
-                        <td th:text= "${key.status}">Status</td>
-                    </tr>
-                </tbody>
-            </table>
+    <!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title th:text="${email}"></title>
+    <link rel="stylesheet" th:href="@{/css/usercss.css}" />
+  </head>
+  <body>
+    <div class="navbar">
+      <h1>USER Dashboard</h1>
+      <a th:href="@{/logout}" href="#" class="btn">Logout</a>
+    </div>
 
-            <hr />
-            <a href="#" th:href="@{/web/generate}">Generate</a>
-        </body>
+    <div class="container">
+      <div class="card-container">
+        <div class="card" th:each="key : ${keys}">
+          <h3 th:text="${key.email}"></h3>
+          <p><strong>Access Key:</strong> <span th:text="${key.keyValue}"></span></p>
+          <p><strong>Procured Date:</strong> <span th:text="${key.procured_date}"></span></p>
+          <p><strong>Expiry Date:</strong> <span th:text="${key.expiry_date}"></span></p>
+          <p><strong>Status:</strong> <span th:text="${key.status}"></span></p>
+        </div>
+      </div>
 
-    </html>
+      <form action="#" th:action="@{/web/users/generate}" method="post" class="generate-form">
+        <button type="submit" class="btn">Generate</button>
+      </form>
+    </div>
+  </body>
+</html>

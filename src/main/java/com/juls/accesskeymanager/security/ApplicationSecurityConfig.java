@@ -40,15 +40,18 @@ public class ApplicationSecurityConfig {
         
         http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.disable())
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/**.html").permitAll()
                 .requestMatchers("/public/**").permitAll()
-                .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
-                .requestMatchers("/api/users/**").hasAuthority("USER")
+                .requestMatchers("/api/admin/**","/web/admin/**").hasAuthority("ADMIN")
+                .requestMatchers("/api/users/**","/web/users/**").hasAuthority("USER")
                 .anyRequest().authenticated()
                 )
                 .formLogin()
+//                .loginPage("/public/login")
+//                .loginProcessingUrl("/public/login")
+                .defaultSuccessUrl("/public/redirect")
                 .permitAll().and()
                 .logout(logout -> logout.permitAll())
                 .authenticationManager(authenticationManager());

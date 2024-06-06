@@ -48,7 +48,8 @@ public class AuthController {
     public ResponseEntity<String> registerUser(@RequestBody AuthenticationRequest authenticationRequest, final HttpServletRequest request){
         try {
             Users user = this.userService.registerUser(authenticationRequest);
-            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request))); 
+            String requestType = "api";
+            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request),requestType)); 
             new ResponseEntity<>(HttpStatus.ACCEPTED);
             return ResponseEntity.ok("User registered successfully"); 
         } catch (Exception e) {
@@ -61,7 +62,8 @@ public class AuthController {
     public ResponseEntity<String> resendVerificationToken(@RequestParam("email") String email, final HttpServletRequest request){
         try {
             var user = this.userService.checkUser(email);
-            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request)));
+            String requestType = "api";
+            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request),requestType));
             new ResponseEntity<>(HttpStatus.OK);
             return ResponseEntity.ok("Token has been resent to your email");
         }
@@ -160,10 +162,5 @@ public class AuthController {
         return null;
     }
     
-    @PostMapping("/resendToken")
-    public String checkSomething(){
-        return "I am checking something";
-    }
-
 
 }
