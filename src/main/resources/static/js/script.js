@@ -1,3 +1,58 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const emailInput = form.querySelector('input[name="email"]');
+    const passwordInput = form.querySelector('input[name="password"]');
+    const confirmPasswordInput = form.querySelector('input[name="confirmPassword"]');
+    const errorMessages = form.querySelectorAll('.error-txt');
+
+    form.addEventListener('submit', function(event) {
+        // Reset error messages
+        errorMessages.forEach(error => error.style.display = 'none');
+
+        let hasErrors = false;
+
+        // Email validation
+        if (!validateEmail(emailInput.value)) {
+            showError(emailInput, 'Please enter a valid email address');
+            hasErrors = true;
+        }
+
+        // Password validation
+        if (!validatePassword(passwordInput.value)) {
+            showError(passwordInput, 'Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a number, and a special character');
+            hasErrors = true;
+        }
+
+        // Confirm password validation
+        if (passwordInput.value !== confirmPasswordInput.value) {
+            showError(confirmPasswordInput, 'Passwords do not match');
+            hasErrors = true;
+        }
+
+        // Prevent form submission if there are errors
+        if (hasErrors) {
+            event.preventDefault();
+        }
+    });
+
+    function validateEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function validatePassword(password) {
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        return passwordRegex.test(password);
+    }
+
+    function showError(input, message) {
+        const errorElement = input.closest('.field').querySelector('.error-txt');
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+    }
+});
+
+
 const form = document.querySelector("form");
 eField = form.querySelector(".email"),
 eInput = eField.querySelector("input"),
@@ -46,9 +101,4 @@ form.onsubmit = (e)=>{
   if(!eField.classList.contains("error") && !pField.classList.contains("error")){
     window.location.href = form.getAttribute("action"); //redirecting user to the specified url which is inside action attribute of form tag
   }
-}
-
-function showSomething(){
-    alert("Hello USER from js");
-
 }

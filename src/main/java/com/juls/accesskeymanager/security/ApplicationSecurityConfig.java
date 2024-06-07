@@ -11,6 +11,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -51,7 +52,17 @@ public class ApplicationSecurityConfig {
                 .formLogin()
                 .loginPage("/public/login")
                 .loginProcessingUrl("/public/login")
-                .defaultSuccessUrl("/public/redirect")
+                .successHandler((request,response,authentication) -> {
+                    for (GrantedAuthority authority : authentication.getAuthorities()){
+                        if (authority.getAuthority().equals("ADMIN")){
+                            response.sendRedirect("/web/admin/dashboard");
+                        }
+                        else if(authority.getAuthority().equals("USER")){
+                            response.sendRedirect("/web/users");
+
+                        }
+                    }
+                })
                 .permitAll().and()
                 .logout(logout -> logout.permitAll())
                 .authenticationManager(authenticationManager());

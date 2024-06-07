@@ -14,11 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import com.juls.accesskeymanager.data.events.RegistrationCompleteEvent;
 import com.juls.accesskeymanager.data.models.AccessKeyDetails;
@@ -69,7 +65,7 @@ public class WebController {
 
     @GetMapping("/register")
     public String registerPage(){
-        return "signup";
+        return "register";
     }
 
     @PostMapping("/registeruser")
@@ -115,11 +111,12 @@ public class WebController {
     }
 
     @RequestMapping("/reset")
-    public String resetPassword(@ModelAttribute String email, final HttpServletRequest request) throws NotFoundException{
+    public String resetPassword(@ModelAttribute String email, final HttpServletRequest request, Model model) throws NotFoundException{
         try {
             String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request));
+            model.addAttribute("message","Verification has been resent to your email successfully");
             log.info("Click on the following link to reset your password : {}",resetLink);
-            return "success-registration";
+            return "registration-success";
             
         } catch (Exception e) {
             log.info("Error message : {}", e.getMessage());
@@ -134,8 +131,8 @@ public class WebController {
             return "registration-success";
     }
 
-    @PostMapping("/resend")
-    public String resendVerification(@RequestParam("email") String email,Model model, final HttpServletRequest request) throws NotFoundException{
+    @RequestMapping("/resend")
+    public String resendVerification(@RequestHeader("email") String email, Model model, final HttpServletRequest request) throws NotFoundException{
         try {
             var user = this.userService.checkUser(email);
             String requestType = "api";
@@ -159,23 +156,6 @@ public class WebController {
             model.addAttribute("error",e.getMessage());
             return "error";
         }
-    }
-
-    @RequestMapping("/redirect")
-    public String redirect(Authentication authentication, Model model){
-        try {
-            String role = this.userService.getRole(authentication.getName());
-            if (role.equalsIgnoreCase("admin")){
-                return "redirect:/web/admin/dashboard";
-            }
-            return "redirect:/web/users";
-
-        } catch (Exception e) {
-            model.addAttribute("error", e.getLocalizedMessage());
-            log.error("Errror message: {}",e.getLocalizedMessage());
-            return "error";
-        }
-        
     }
 
 }

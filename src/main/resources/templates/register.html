@@ -1,52 +1,11 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="en" xmlns:th="http://www.thymeleaf.org">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>Login</title>-->
-<!--    <meta name="viewport" content="initial-width=1.0">-->
-<!--    <link rel="stylesheet" th:href="@{/css/style.css}">-->
-
-<!--</head>-->
-<!--<body>-->
-<!--<div class="container">-->
-<!--    <h1>Welcome to the Application</h1>-->
-<!--    <form th:action="@{/public/login}" method="post" class="login-form">-->
-<!--        <div class="form-group">-->
-<!--            <label for="username">Username:</label>-->
-<!--            <input type="email" id="username" name="username" required>-->
-<!--        </div>-->
-<!--        <div class="form-group">-->
-<!--            <label for="password">Password:</label>-->
-<!--            <input type="password" id="password" name="password" required>-->
-<!--        </div>-->
-<!--        <div th:if="${param.error}" class="error">-->
-<!--            Invalid username or password.-->
-<!--        </div>-->
-<!--        <div th:if="${param.logout}" class="success">-->
-<!--            You have been logged out.-->
-<!--        </div>-->
-<!--        <button type="submit" class="btn">Login</button>-->
-<!--    </form>-->
-
-
-<!--</div>-->
-
-
-<!--</script>-->
-<!--</body>-->
-<!--</html>-->
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
-    <!-- Bootstrap CSS for modal -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 
@@ -272,92 +231,40 @@ form input[type="submit"]:hover {
 }
 
 }
-
-    </style>
+</style>
 </head>
 <body>
 <div class="wrapper">
-    <header>Login Form</header>
-    <form id="loginForm" th:action="@{/public/login}" method="post">
+    <header>Registration Form</header>
+    <form th:action="@{/public/registeruser}" method="post">
         <div class="field email">
             <div class="input-area">
-                <input type="email" id="username" name="username" placeholder="Email Address" required>
+                <input type="text" name="email" placeholder="Email Address" required>
                 <i class="icon fas fa-envelope"></i>
                 <i class="error error-icon fas fa-exclamation-circle"></i>
             </div>
+            <div class="error error-txt">Email can't be blank</div>
         </div>
         <div class="field password">
             <div class="input-area">
-                <input type="password" id="password" name="password" placeholder="Password" required>
+                <input type="password" name="password" placeholder="Password" required>
                 <i class="icon fas fa-lock"></i>
                 <i class="error error-icon fas fa-exclamation-circle"></i>
             </div>
+            <div class="error error-txt">Password can't be blank</div>
         </div>
-        <div class="pass-txt"><a th:href="@{/public/reset}">Forgot password?</a></div>
-        <div th:if="${param.error}" class="error">
-            Invalid username or password.
+        <div class="field password">
+            <div class="input-area">
+                <input type="password" name="confirm" placeholder="Confirm Password" required>
+                <i class="icon fas fa-lock"></i>
+                <i class="error error-icon fas fa-exclamation-circle"></i>
+            </div>
+            <div class="error error-txt">Confirmation password can't be blank</div>
         </div>
-        <div th:if="${param.logout}" class="success">
-            You have been logged out.
-        </div>
-        <input type="submit" value="Login">
+        <input type="submit" value="Register">
     </form>
-    <div class="sign-txt">Not yet a member? <a href="/public/register">Signup now</a></div>
+    <div class="sign-txt">Already registered? <a th:href="@{/login}">Sign in</a></div>
 </div>
-
-<!-- Modal HTML -->
-<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="messageModalLabel">Message</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="modal-message"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Bootstrap JS for modal -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-<!-- Custom JS for modal and validation -->
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('error')) {
-            showModal('Invalid username or password.');
-        }
-        if (urlParams.has('logout')) {
-            showModal('You have been logged out.');
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', function(event) {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if (!username) {
-                event.preventDefault();
-                showModal('Email can\'t be blank');
-            } else if (!password) {
-                event.preventDefault();
-                showModal('Password can\'t be blank');
-            }
-        });
-
-        function showModal(message) {
-            document.getElementById('modal-message').textContent = message;
-            $('#messageModal').modal('show');
-        }
-    });
-</script>
+<script th:src="@{/js/script.js}" type="text/javascript"></script>
 </body>
 </html>

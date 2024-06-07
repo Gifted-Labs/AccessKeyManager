@@ -1,13 +1,99 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <title>Registration Success</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REGISTRATION SUCCESS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: linear-gradient(to bottom right, #6a2c70, #c96567); /* Gradient background */
+        }
+
+        .wrapper {
+            width: 80%;
+            max-width: 600px;
+            padding: 40px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .wrapper header {
+            font-size: 36px;
+            font-weight: 600;
+            color: #333; /* White header text */
+            margin-bottom: 20px;
+        }
+
+        .message {
+            font-size: 24px;
+            color: 2a2a; /* White message text */
+            margin-bottom: 30px;
+        }
+
+        .instructions {
+            font-size: 18px;
+            color: #0f0f0f; /* Light gray instruction text */
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .links {
+            margin-top: 20px;
+        }
+
+        .links a {
+            background:  #c96567;
+            color: #fff; /* White text */
+            text-decoration: none;
+            font-size: 18px;
+            padding: 15px 30px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            margin-right: 20px;
+        }
+
+        .links a:last-child {
+            margin-right: 0;
+        }
+
+        .links a:hover {
+            background: #6a2c70; /* Darker shade of primary color */background-image: linear-gradient(to bottom right, #6a2c70, #c96567); /* Gradient background */
+        }
+
+        .resend-email {
+            color: #fff; /* White resend email text */
+            text-decoration: underline;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body>
-    <h3>You have registered successfully</h3>
-    <p>Proceed to the email you provided to verify your account</p>
-    <a href="#" th:href="@{/resend}">Resend email</a>
+<div class="wrapper">
+    <header>Registration Successful</header>
+    <div class="message">Thank you for registering!</div>
+    <div class="message" th:text="${message}" hidden="until-found"></div>
+    <div class="instructions">Please check your email to verify your account and complete the registration process.</div>
+    <div class="links">
+        <a th:href="@{/public/login}">Go to Login</a>
+        <a th:href="@{/public/resend}" class="resend-email">Resend Verification</a>
+    </div>
+</div>
 </body>
 </html>
