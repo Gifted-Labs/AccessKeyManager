@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableScheduling*[p]
+@EnableScheduling
 public class AccesskeymanagerApplication {
 
 	
@@ -14,5 +14,5 @@ public class AccesskeymanagerApplication {
 	 */
 	public static void main(String[] args) {
 		SpringApplication.run(AccesskeymanagerApplication.class, args);
-	}
+	} 
 }

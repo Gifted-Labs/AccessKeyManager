@@ -146,7 +146,12 @@ public class UserServiceImpl implements UserService{
     }
 
 
-    
+    /**
+     * Verifies if a user with the given email exists and is enabled.
+     *
+     * @param email The email address of the user to be verified.
+     * @return true if the user exists and is enabled, false otherwise.
+     */
     public boolean verifyUser(String email){
         boolean flag = false;
         if(this.userRepository.findByEmail(email).isPresent()){
@@ -159,10 +164,6 @@ public class UserServiceImpl implements UserService{
             }
         }
         return flag;
-    }    
-
-    public String getRole(String email){
-        return this.getUserByEmail(email).getRole().toString();
     }
 
 
@@ -207,7 +208,7 @@ public class UserServiceImpl implements UserService{
     }
     
 
-    public boolean updatePassword(String token, String password) throws BadRequestException{
+    public boolean updatePassword(String token , String password) throws BadRequestException{
         boolean flag = false;
         var user = this.getUserByToken(token);
         
@@ -226,8 +227,11 @@ public class UserServiceImpl implements UserService{
         }
         return flag;
     }
+
+
+
     
-    public String resetPasswordInit(String email, String url) throws NotFoundException{
+    public String resetPasswordInit(String email, String url,String type) throws NotFoundException{
         
         var user = this.getUserForReset(email);
         if (user==null){
@@ -235,7 +239,13 @@ public class UserServiceImpl implements UserService{
         }
         String resetToken = UUID.randomUUID().toString();
         this.saveVerificationToken(user, resetToken);
-        String resetLink = url+"/register/resetPassword?token="+resetToken;
+        String resetLink = "";
+        if(type.equalsIgnoreCase("web")){
+            resetLink = url+"/public/resetPassword?token="+resetToken;
+        }
+        else if(type.equalsIgnoreCase(("api"))){
+            resetLink = url+"/register/resetPassword?token="+resetToken;
+        }
         EmailRequest emailRequest = new EmailRequest(email, resetLink);
         this.emailService.sendResetTokenEmail(emailRequest);
         return resetLink;

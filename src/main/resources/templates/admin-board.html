@@ -1,66 +1,176 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MICROFOCUS INC</title>
-    <link rel="stylesheet" th:href="@{/css/adminstyle.css}">
+    <link rel="stylesheet" th:href="@{/css/userstyle.css}">
+
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .navbar {
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 1200px;
+        }
+        .search {
+            width: calc(100% - 100px);
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            vertical-align: top;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .card-title {
+            font-weight: bold;
+        }
+        .card-text {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .btn-danger {
+            float: right;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">ACCESS KEY MANAGER</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" th:href="@{/logout}">Logout</a>
-                </li>a
-            </ul>
-        </div>
-    </nav>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">ACCESS KEY MANAGER</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/logout}">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
 
-    <div class="container mt-4">
-        <h2>Admin Dashboard</h2>
-        <div class="form-group">
-            <form action="" th:action="@{/web/admin/search}" method="get">
-                <input type="search" class="search" name="search" placeholder="Search Active Key by Email...">
-                <button class="btn btn-primary mt-2">Search</button>
-            </form>
-        </div>
-        <div id="search-result" class="alert alert-info mt-2" style="display: none;"></div>
-        <div class="row" id="keys-container">
-            <!-- Card Layout -->
-            <div class="col-md-6 mb-4" th:each="key : ${keys}">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${key.email}">Email</h5>
-                        <p class="card-text">
-                            <strong>Access Key:</strong> <span th:text="${key.keyValue}">Access Key</span><br>
-                            <strong>Procured Date:</strong> <span th:text="${key.procured_date}">Procured Date</span><br>
-                            <strong>Expiry Date:</strong> <span th:text="${key.expiry_date}">Expiry Date</span><br>
-                            <strong>Status:</strong> <span th:text="${key.status}">Status</span>
-                        </p>
-                        <a th:href="@{/web/admin/revoke(email=${key.email})}" href="#" class="btn btn-danger btn-sm revoke-btn" >Revoke</a>
-                    </div>
+<div class="container mt-4">
+    <h2>Admin Dashboard</h2>
+    <div class="form-group">
+        <form id="searchForm" th:action="@{/web/admin/search}" method="get">
+            <input type="search" class="form-control search" id="searchInput" name="search" placeholder="Search Active Key by Email...">
+            <button type="submit" class="btn btn-primary" onclick="searchKey()">Search</button>
+        </form>
+    </div>
+    <div id="search-result" class="alert alert-info mt-2" style="display: none;"></div>
+    <div class="row" id="keys-container">
+        <!-- Card Layout -->
+        <div class="col-md-6 mb-4" th:each="key : ${keys}">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${key.email}">Email</h5>
+                    <p class="card-text">
+                        <strong>Access Key:</strong> <span th:text="${key.keyValue}">Access Key</span><br>
+                        <strong>Procured Date:</strong> <span th:text="${key.procured_date}">Procured Date</span><br>
+                        <strong>Expiry Date:</strong> <span th:text="${key.expiry_date}">Expiry Date</span><br>
+                        <strong>Status:</strong> <span th:text="${key.status}">Status</span>
+                    </p>
+                    <button class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" th:data-email="${key.email}">Revoke</button>
                 </div>
             </div>
         </div>
-
-
     </div>
+</div>
 
+<!-- Revoke Confirmation Modal -->
+<div class="modal fade" id="revokeModal" tabindex="-1" role="dialog" aria-labelledby="revokeModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="revokeModalLabel">Confirm Revoke</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to revoke the key for <strong id="revokeEmail"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <a id="confirmRevoke" href="#" class="btn btn-danger">Revoke</a>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Search Result Modal -->
+<div class="modal fade" id="searchResultModal" tabindex="-1" role="dialog" aria-labelledby="searchResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="searchResultModalLabel">Search Result</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" th:hidden="until-found">
+                <p><strong>Email:</strong> <span id="searchEmail"></span></p>
+                <p><strong>Procured Date:</strong> <span id="searchProcuredDate" ></span></p>
+                <p><strong>Expiry Date:</strong> <span id="searchExpiryDate" ></span></p>
+                <p><strong>Status:</strong> <span id="searchStatus" ></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="searchRevokeButton" data-dismiss="modal">Revoke</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <script th:src="@{https://code.jquery.com/jquery-3.2.1.slim.min.js}"></script>
-    <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js}"></script>
-    <script th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
-    <script src="js/script.js"></script>
+<script th:src="@{https://code.jquery.com/jquery-3.2.1.slim.min.js}"></script>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js}"></script>
+<script th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
+<script>
+    $(document).ready(function() {
+        $('#revokeModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Button that triggered the modal
+            var email = button.data('email'); // Extract email from data-* attribute
+            var modal = $(this);
+            modal.find('#revokeEmail').text(email);
+            modal.find('#confirmRevoke').attr('href', /*[[@{/public/revoke}]]*/ + '?email=' + email);
+        });
+
+        $('#searchRevokeButton').click(function() {
+            var email = $('#searchEmail').text();
+            window.location.href = /*[[@{/public/revoke}]]*/ + '?email=' + email;
+        });
+    });
+
+    function searchKey() {
+        var email = $('#searchInput').val();
+        $.ajax({
+            url: '/web/admin/search',
+            type: 'GET',
+            data: { search: email },
+            success: function(response) {
+                if (response) {
+                    $('#searchEmail').text(response.email);
+                    $('#searchKeyValue').text(response.keyValue);
+                    $('#searchProcuredDate').text(response.procuredDate);
+                    $('#searchExpiryDate').text(response.expiryDate);
+                    $('#searchStatus').text(response.status);
+                    $('#searchResultModal').modal('show');
+                } else {
+                    alert('No active key found for this email.');
+                }
+            },
+            error: function() {
+                alert('An error occurred while searching. Please try again.');
+            }
+        });
+    }
+</script>
 </body>
 </html>
-

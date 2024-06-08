@@ -77,7 +77,7 @@ public class AuthController {
         public ResponseEntity<String> resendReset(@RequestParam(value = "email")String email, final HttpServletRequest request) throws NotFoundException{
             try {
                 if (this.userService.verifyUser(email)){
-                String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request));
+                String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request),"api");
                 log.info("Click on the following link to reset your password: {}",resetLink);
                 return ResponseEntity.ok().body("Reset Request has been sent to your email successfulyy");
             }
@@ -121,7 +121,7 @@ public class AuthController {
     @PostMapping("/reset")
     public ResponseEntity<String> resetInit(@RequestParam(value = "email")String email, final HttpServletRequest request) throws NotFoundException{
         try {
-            String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request));
+            String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request),"api");
             log.info("Click on the following link to reset your password: {}",resetLink);
             return ResponseEntity.ok().body("Reset Request has been sent to your email successfulyy");
         } catch (Exception e) {
@@ -161,6 +161,4 @@ public class AuthController {
         }
         return null;
     }
-    
-
 }

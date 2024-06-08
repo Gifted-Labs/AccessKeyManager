@@ -110,10 +110,17 @@ public class WebController {
         }
     }
 
-    @RequestMapping("/reset")
-    public String resetPassword(@ModelAttribute String email, final HttpServletRequest request, Model model) throws NotFoundException{
+
+
+    @GetMapping("/reset")
+    public String forgotPassword(){
+        return "resetpassword";
+    }
+
+    @PostMapping("/reset")
+    public String resetPassword(@RequestParam String email, final HttpServletRequest request, Model model) throws NotFoundException{
         try {
-            String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request));
+            String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request),"web");
             model.addAttribute("message","Verification has been resent to your email successfully");
             log.info("Click on the following link to reset your password : {}",resetLink);
             return "registration-success";
@@ -125,6 +132,9 @@ public class WebController {
         
         
     }
+
+
+
 
     @GetMapping("/registration-success")
     public String registrationSuccess(@RequestParam("email") String email){
