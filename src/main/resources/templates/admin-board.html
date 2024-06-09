@@ -63,6 +63,14 @@
             <input type="search" class="form-control search" id="searchInput" name="search" placeholder="Search Active Key by Email...">
             <button type="submit" class="btn btn-primary" onclick="searchKey()">Search</button>
         </form>
+        <form id="sort" th:action="@{/web/admin/filter}" method="get">
+            <label for="filterOption">Sort By <select id="filterOption" name="filterOption" id="filterOption">
+                <option value="email">Email</option>
+                <option value="date">Date</option>
+                <option value="status">Status</option>
+            </select>
+            </label>
+        </form>
     </div>
     <div id="search-result" class="alert alert-info mt-2" style="display: none;"></div>
     <div class="row" id="keys-container">
@@ -77,100 +85,12 @@
                         <strong>Expiry Date:</strong> <span th:text="${key.expiry_date}">Expiry Date</span><br>
                         <strong>Status:</strong> <span th:text="${key.status}">Status</span>
                     </p>
-                    <button class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" th:data-email="${key.email}">Revoke</button>
+                    <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" th:href="@{/web/admin/revoke?(email=${key.email})}">Revoke</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Revoke Confirmation Modal -->
-<div class="modal fade" id="revokeModal" tabindex="-1" role="dialog" aria-labelledby="revokeModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="revokeModalLabel">Confirm Revoke</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to revoke the key for <strong id="revokeEmail"></strong>?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <a id="confirmRevoke" href="#" class="btn btn-danger">Revoke</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Search Result Modal -->
-<div class="modal fade" id="searchResultModal" tabindex="-1" role="dialog" aria-labelledby="searchResultModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="searchResultModalLabel">Search Result</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" th:hidden="until-found">
-                <p><strong>Email:</strong> <span id="searchEmail"></span></p>
-                <p><strong>Procured Date:</strong> <span id="searchProcuredDate" ></span></p>
-                <p><strong>Expiry Date:</strong> <span id="searchExpiryDate" ></span></p>
-                <p><strong>Status:</strong> <span id="searchStatus" ></span></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" id="searchRevokeButton" data-dismiss="modal">Revoke</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script th:src="@{https://code.jquery.com/jquery-3.2.1.slim.min.js}"></script>
-<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js}"></script>
-<script th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
-<script>
-    $(document).ready(function() {
-        $('#revokeModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var email = button.data('email'); // Extract email from data-* attribute
-            var modal = $(this);
-            modal.find('#revokeEmail').text(email);
-            modal.find('#confirmRevoke').attr('href', /*[[@{/public/revoke}]]*/ + '?email=' + email);
-        });
-
-        $('#searchRevokeButton').click(function() {
-            var email = $('#searchEmail').text();
-            window.location.href = /*[[@{/public/revoke}]]*/ + '?email=' + email;
-        });
-    });
-
-    function searchKey() {
-        var email = $('#searchInput').val();
-        $.ajax({
-            url: '/web/admin/search',
-            type: 'GET',
-            data: { search: email },
-            success: function(response) {
-                if (response) {
-                    $('#searchEmail').text(response.email);
-                    $('#searchKeyValue').text(response.keyValue);
-                    $('#searchProcuredDate').text(response.procuredDate);
-                    $('#searchExpiryDate').text(response.expiryDate);
-                    $('#searchStatus').text(response.status);
-                    $('#searchResultModal').modal('show');
-                } else {
-                    alert('No active key found for this email.');
-                }
-            },
-            error: function() {
-                alert('An error occurred while searching. Please try again.');
-            }
-        });
-    }
-</script>
 </body>
 </html>
