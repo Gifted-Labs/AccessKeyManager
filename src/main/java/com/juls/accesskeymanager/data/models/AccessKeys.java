@@ -2,6 +2,7 @@ package com.juls.accesskeymanager.data.models;
 
 import java.sql.Date;
 
+import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.NaturalId;
 
 import jakarta.persistence.Column;

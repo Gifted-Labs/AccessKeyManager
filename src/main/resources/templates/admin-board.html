@@ -63,15 +63,7 @@
             <input type="search" class="form-control search" id="searchInput" name="search" placeholder="Search Active Key by Email...">
             <button type="submit" class="btn btn-primary" onclick="searchKey()">Search</button>
         </form>
-        <form id="sort" th:action="@{/web/admin/filter}" method="get">
-            <label for="filterOption">Sort By <select id="filterOption" name="filterOption" id="filterOption">
-                <option value="email">Email</option>
-                <option value="date">Date</option>
-                <option value="status">Status</option>
-            </select>
-            </label>
-        </form>
-    </div>
+           </div>
     <div id="search-result" class="alert alert-info mt-2" style="display: none;"></div>
     <div class="row" id="keys-container">
         <!-- Card Layout -->

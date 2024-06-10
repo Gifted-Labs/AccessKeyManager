@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -45,6 +46,8 @@ public class AccessKeyService {
         return keyDetails.values().stream().toList();
     }
 
+
+
     public List <AccessKeyDetails> getAllKeysByEmail(String email){
         List <AccessKeys> accessKeys = this.accessKeyRepo.findByUser(this.userService.getUserByEmail(email));
         Map <Long, AccessKeyDetails> keyDetails = new HashMap<>();
@@ -73,15 +76,40 @@ public class AccessKeyService {
         return activeKey;
     }
 
-    public AccessKeys revokeKey(String email) throws BadRequestException{
-        AccessKeyDetails key = getActiveKeyByEmail(email);
-        Optional <AccessKeys> accessKey = this.accessKeyRepo.findByKeyValue(key.getKeyValue());
-        if (accessKey.get().getStatus()==Status.EXPIRED || accessKey.get().getStatus()==Status.REVOKED){
-            throw new BadRequestException("You cannot revoke this key");
+//    public AccessKeys revokeKey(String email) throws BadRequestException{
+//        AccessKeyDetails key = getActiveKeyByEmail(email);
+//        Optional <AccessKeys> accessKey = this.accessKeyRepo.findByKeyValue(key.getKeyValue());
+//        if (accessKey.get().getStatus()==Status.EXPIRED || accessKey.get().getStatus()==Status.REVOKED){
+//            throw new BadRequestException("You cannot revoke this key");
+//        }
+//        accessKey.get().setStatus(Status.REVOKED);
+//        AccessKeys updatedKey = this.accessKeyRepo.save(accessKey.get());
+//        return updatedKey;
+//    }
+
+    public Optional <AccessKeys> getActiveKeyByStatus(String email){
+        Status status = Status.ACTIVE;
+        var user = this.userService.getUserByEmail(email);
+        return this.accessKeyRepo.findByStatusAndUser(status,user);
+    }
+
+
+
+    public AccessKeys revokeKey(String email) throws BadRequestException {
+        Optional<AccessKeys> accessKey = this.getActiveKeyByStatus(email);
+
+        if (accessKey.isPresent()) {
+            if (accessKey.get().getStatus() == Status.EXPIRED || accessKey.get().getStatus() == Status.REVOKED) {
+                throw new BadRequestException("You cannot revoke this key");
+            }
+            accessKey.get().setStatus(Status.REVOKED);
+            return this.accessKeyRepo.save(accessKey.get());
+        } else {
+            throw new BadRequestException("There's no Access Key");
+
         }
-        accessKey.get().setStatus(Status.REVOKED);
-        AccessKeys updatedKey = this.accessKeyRepo.save(accessKey.get());
-        return updatedKey;
+
+
     }
 
     private AccessKeys generatAccessKeys(String email){

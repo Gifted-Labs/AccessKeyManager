@@ -208,17 +208,20 @@ public class UserServiceImpl implements UserService{
     }
     
 
-    public boolean updatePassword(String token , String password) throws BadRequestException{
+    public boolean updatePassword(String email , String password, String confirm) throws BadRequestException{
         boolean flag = false;
-        var user = this.getUserByToken(token);
-        
+        var user = this.getUserByEmail(email);
+        String mainPass = "";
         if (!user.isEnabled()){
             throw new BadRequestException("This account is not verified");
-        }
-        else {
-            user.setPassword(this.passwordEncoder.encode(password));
+        } else if (email.isEmpty()) {
+            throw new BadRequestException("Empty email String");
+        } else {
+            if (password.equals(confirm)){
+                mainPass = password;
+            }
+            user.setPassword(this.passwordEncoder.encode(mainPass));
             this.userRepository.save(user);
-            this.verificationRepository.delete(this.verificationRepository.findByToken(token));
             flag = true;
             EmailRequest request = new EmailRequest();
             request.setReciepient(user.getEmail());

@@ -146,10 +146,10 @@ public class AuthController {
 
     
     @GetMapping("/update")
-    public ResponseEntity<String> updatePassword(@RequestParam("password")String password, @RequestParam("token") String token){
+    public ResponseEntity<String> updatePassword(@RequestParam("password")String password, @RequestParam("confirm") String confirm, @RequestParam("token") String token){
         try {
             String email = this.userService.getUserByToken(token).getEmail();
-            boolean isUpdated = this.userService.updatePassword(token, password);
+            boolean isUpdated = this.userService.updatePassword(email, password,confirm);
             if (isUpdated){
                 new ResponseEntity<>(HttpStatus.OK);
                 return ResponseEntity.ok().body("Password updated successfully. Login with your new password");

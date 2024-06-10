@@ -2,6 +2,7 @@ package com.juls.accesskeymanager.web.controllers;
 
 import java.util.List;
 
+import com.juls.accesskeymanager.exceptions.BadRequestException;
 import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties.AssertingParty.Verification;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -163,6 +164,42 @@ public class WebController {
             return "success-registration";    
         } catch (Exception e) {
             log.info(e.getMessage());
+            model.addAttribute("error",e.getMessage());
+            return "error";
+        }
+    }
+
+    @GetMapping("/resetPassword")
+    public String resetPass(@RequestParam("token") String token, Model model){
+        try {
+            String email = this.userService.getUserByToken(token).getEmail();
+            if("valid".equalsIgnoreCase(this.userService.validateResetToken(token))){
+                model.addAttribute("email",email);
+                return "updatepass";
+            }
+            else {
+                return "redirect:/public/login";
+            }
+        }
+        catch (Exception e){
+            model.addAttribute("error",e.getMessage());
+            return "error";
+        }
+    }
+
+    @PostMapping("/updatePassword")
+    public String updatePassword(@RequestParam("password")String password, @RequestParam("confirm") String confirm,@RequestParam("email") String email, Model model){
+        try {
+            if(this.userService.updatePassword(email,password,confirm)){
+                return "reset-success";
+            };
+            return null;
+        }
+        catch (BadRequestException badRequestException){
+            model.addAttribute("error",badRequestException.getMessage());
+            return "error";
+        }
+        catch (Exception e){
             model.addAttribute("error",e.getMessage());
             return "error";
         }

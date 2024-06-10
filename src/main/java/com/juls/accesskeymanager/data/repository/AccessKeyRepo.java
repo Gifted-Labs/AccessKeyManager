@@ -16,5 +16,7 @@ public interface AccessKeyRepo extends JpaRepository<AccessKeys, Long> {
     List <AccessKeys> findByStatus(Status status);
     Optional <AccessKeys> findByKeyValue(String keyValue);
 
+    Optional <AccessKeys> findByStatusAndUser(Status status, Users user);
+
 }
 
