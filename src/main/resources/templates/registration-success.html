@@ -87,6 +87,9 @@
 <body>
 <div class="wrapper">
     <header>Registration Successful</header>
+    <form action="" method="post">
+        <input type="hidden" name="email" id="email" th:value="${email}">
+    </form>
     <div class="message">Thank you for registering!</div>
     <div class="message" th:text="${message}" hidden="until-found"></div>
     <div class="instructions">Please check your email to verify your account and complete the registration process.</div>

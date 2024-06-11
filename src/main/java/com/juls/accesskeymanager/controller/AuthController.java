@@ -143,7 +143,8 @@ public class AuthController {
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
+    
+    
     
     @GetMapping("/update")
     public ResponseEntity<String> updatePassword(@RequestParam("password")String password, @RequestParam("confirm") String confirm, @RequestParam("token") String token){

@@ -138,17 +138,18 @@ public class WebController {
 
 
     @GetMapping("/registration-success")
-    public String registrationSuccess(@RequestParam("email") String email){
+    public String registrationSuccess(Model model){
             return "registration-success";
     }
 
     @RequestMapping("/resend")
-    public String resendVerification(@RequestHeader("email") String email, Model model, final HttpServletRequest request) throws NotFoundException{
+    public String resendVerification(@RequestParam("email") String email, Model model, final HttpServletRequest request) throws NotFoundException{
         try {
             var user = this.userService.checkUser(email);
-            String requestType = "api";
+            String requestType = "web";
             this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request),requestType));
-            return "redirect:/registration-success?email="+email;
+            model.addAttribute("email",email);
+            return "registration-success";
         }
         catch (Exception e){
             log.info(e.getMessage());
