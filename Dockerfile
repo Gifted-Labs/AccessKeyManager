@@ -21,4 +21,4 @@ RUN mvn clean package -DskipTests
 EXPOSE 8080
 
 # Set the command to run the Spring Boot application
-CMD ["java", "-jar", "*.jar"]
+CMD ["java", "-jar", "target/*.jar"]
