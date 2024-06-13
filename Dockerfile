@@ -19,10 +19,10 @@ RUN chmod +x mvnw
 RUN mvn clean package -DskipTests
 
 # Copy the packaged JAR file
-COPY target/accesskeymanager-0.0.1-SNAPSHOT.jar /app/accesskeymanager-0.0.1-SNAPSHOT.jar
+COPY target/*.jar /app/*.jar
 
 # Expose the port your application listens on
 EXPOSE 8080
 
 # Set the command to run the Spring Boot application
-CMD ["java", "-jar", "accesskeymanager-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "*.jar"]
