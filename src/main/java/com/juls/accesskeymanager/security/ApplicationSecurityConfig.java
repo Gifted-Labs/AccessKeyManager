@@ -1,8 +1,6 @@
 package com.juls.accesskeymanager.security;
 
 
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -45,6 +43,7 @@ public class ApplicationSecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/public/**").permitAll()
+                            .requestMatchers("/public/documentation/**").permitAll()
                 .requestMatchers("/api/admin/**","/web/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/api/users/**","/web/users/**").hasAuthority("USER")
                 .anyRequest().authenticated()

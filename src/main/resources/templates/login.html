@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>AccessKey Manager Login</title>
+    <title>LOGIN - ACCESS KEY MANAGER</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
@@ -187,9 +187,7 @@
         <div th:if="${param.error}" class="error">
             Invalid username or password.
         </div>
-<!--        <div th:if="${param.logout}" class="success">-->
-<!--            You have been logged out.-->
-<!--        </div>-->
+
         <input type="submit" value="Login">
     </form>
     <div class="sign-txt">Not yet a member? <a href="/public/register">Signup now</a></div>

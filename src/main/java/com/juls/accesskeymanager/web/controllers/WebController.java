@@ -41,28 +41,23 @@ public class WebController {
     public final ApplicationEventPublisher publisher;
      private final AuthenticationManager authenticationManager;
 
-    @GetMapping("/login")
+
+
+    @GetMapping("/home")
+    public String home(){
+        return "index";
+    }
+
+    @GetMapping("/documentation")
+    public String documentation(){
+        return "documentation/index";
+    }
+
+     @GetMapping("/login")
     public String getLoginPage(){
         return "login";
     }
 
-//     @PostMapping("/login")
-//     public String processLogin(@RequestParam("username") String username, @RequestParam("password") String password, HttpServletRequest request, Model model){
-//         try {
-//
-//             if (this.userService.authenticatedUser(username,password)){
-//                 return "redirect:/public/redirect";
-//             }
-//             return null;
-//
-//         } catch (Exception e) {
-//             log.info("Error info : {}", e.getMessage());
-//             model.addAttribute("error", e.getMessage());
-//             return "error";
-//         }
-//     }
-
-    
 
     @GetMapping("/register")
     public String registerPage(){
