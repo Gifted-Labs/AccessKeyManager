@@ -1,19 +1,15 @@
 # Use the official Java 21 image as the base image
 FROM openjdk:21-jdk-slim
 
+# Install Maven
+RUN apt-get update && apt-get install -y maven
+
 # Set the working directory
 WORKDIR /app
-
-# Copy the Maven wrapper script (if you're using it)
-COPY mvnw .
-COPY .mvn .mvn
 
 # Copy the application code
 COPY src ./src
 COPY pom.xml .
-
-# Make the Maven wrapper executable (if you're using it)
-RUN chmod +x mvnw
 
 # Build the application
 RUN mvn clean package -DskipTests
