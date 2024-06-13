@@ -14,11 +14,10 @@ COPY pom.xml .
 # Build the application
 RUN mvn clean package -DskipTests
 
-# Copy the packaged JAR file
-#COPY target/*.jar /app/*.jar
-
 # Expose the port your application listens on
 EXPOSE 8080
 
+COPY --from=build /target/accesskeymanager-0.0.1-SNAPSHOT.jar app.jar
+
 # Set the command to run the Spring Boot application
-ENTRYPOINT ["java", "-jar", "accesskeymanager-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
