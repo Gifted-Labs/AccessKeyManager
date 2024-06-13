@@ -1,5 +1,11 @@
+FROM ubuntu:latest AS build
+
+RUN apt-get update
+
+RUN apt-get install -y openjdk-21-slim maven
+
 # Use the official Java 21 image as the base image
-FROM openjdk:21-jdk-slim
+#FROM openjdk:21-jdk-slim
 
 # Install Maven
 RUN apt-get update && apt-get install -y maven
