@@ -3,6 +3,7 @@ package com.juls.accesskeymanager.services;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -76,6 +77,10 @@ public class AccessKeyService {
         return activeKey;
     }
 
+
+
+
+
 //    public AccessKeys revokeKey(String email) throws BadRequestException{
 //        AccessKeyDetails key = getActiveKeyByEmail(email);
 //        Optional <AccessKeys> accessKey = this.accessKeyRepo.findByKeyValue(key.getKeyValue());
@@ -93,6 +98,26 @@ public class AccessKeyService {
         return this.accessKeyRepo.findByStatusAndUser(status,user);
     }
 
+    public List<AccessKeyDetails> sortKeys(String sortBy) {
+        List<AccessKeyDetails> allKeys = new ArrayList<>(getAllAccessKeys());
+
+        switch (sortBy.toLowerCase()) {
+            case "email":
+                allKeys.sort(Comparator.comparing(AccessKeyDetails::getEmail));
+                break;
+            case "expirydate":
+                allKeys.sort(Comparator.comparing(AccessKeyDetails::getExpiry_date));
+                break;
+            case "status":
+                allKeys.sort(Comparator.comparing(AccessKeyDetails::getStatus));
+                break;
+            default:
+                break;
+        }
+
+        return allKeys;
+    }
+
 
 
     public AccessKeys revokeKey(String email) throws BadRequestException {
@@ -102,13 +127,13 @@ public class AccessKeyService {
             if (accessKey.get().getStatus() == Status.EXPIRED || accessKey.get().getStatus() == Status.REVOKED) {
                 throw new BadRequestException("You cannot revoke this key");
             }
-            accessKey.get().setStatus(Status.REVOKED);
-            return this.accessKeyRepo.save(accessKey.get());
-        } else {
-            throw new BadRequestException("There's no Access Key");
 
         }
-
+        else if(accessKey.isEmpty()){
+            throw new BadRequestException("No Access Key found");
+        }
+        accessKey.get().setStatus(Status.REVOKED);
+        return this.accessKeyRepo.save(accessKey.get());
 
     }
 
@@ -123,16 +148,18 @@ public class AccessKeyService {
         return accessKey;
     }
 
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public AccessKeys generateKey(String email) throws BadRequestException{
-        AccessKeys key = new AccessKeys();
-        if (this.getActiveKeyByEmail(email)==null){
-            key = generatAccessKeys(email);
-        }
-        else{
+    public boolean userHasActiveKey(String email){
+        return getActiveKeyByEmail(email)!=null;
+    }
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public AccessKeys generateKey(String email) throws BadRequestException {
+        // Check if user already has an active key
+        if (userHasActiveKey(email)) {
             throw new BadRequestException("You already have an active key");
         }
-    
+
+        // Generate and save a new access key
+        AccessKeys key = generatAccessKeys(email);
         return this.accessKeyRepo.save(key);
     }
 

@@ -6,6 +6,12 @@
     </head>
 
     <body>
-        <h2 th:text="${error}">The error message: {}</h2>
+        <h2 th:text="${error}">The error message: </h2>
+        <button type="button" onlick="showAlert()">Click Me</button>
+        <script>
+           function showAlert(){
+               alert("Hello World");
+           }
+        </script>
     </body>
 </html>

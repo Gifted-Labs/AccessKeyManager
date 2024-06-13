@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MICROFOCUS INC</title>
     <link rel="stylesheet" th:href="@{/css/userstyle.css}">
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .navbar {
@@ -39,12 +38,17 @@
         .btn-danger {
             float: right;
         }
+        .active-key-card {
+            border: 2px solid #007bff;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">ACCESS KEY MANAGER</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
+            aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
@@ -59,15 +63,23 @@
 <div class="container mt-4">
     <h2>Admin Dashboard</h2>
     <div class="form-group">
-        <form id="searchForm" th:action="@{/web/admin/search}" method="get">
+        <form id="searchForm" th:action="@{/web/admin/search}" method="get" onsubmit="searchKey(event)">
             <input type="search" class="form-control search" id="searchInput" name="search" placeholder="Search Active Key by Email...">
-            <button type="submit" class="btn btn-primary" onclick="searchKey()">Search</button>
+            <button type="submit" class="btn btn-primary">Search</button>
         </form>
-           </div>
+    </div>
+    <div class="form-group">
+        <select class="form-control" id="sortCriteria" onchange="sortKeys()">
+            <option value="">Sort by...</option>
+            <option value="email">Email</option>
+            <option value="expiryDate">Expiry Date</option>
+            <option value="status">Status</option>
+        </select>
+    </div>
     <div id="search-result" class="alert alert-info mt-2" style="display: none;"></div>
     <div class="row" id="keys-container">
-        <!-- Card Layout -->
-        <div class="col-md-6 mb-4" th:each="key : ${keys}">
+        <!-- Existing keys will be displayed here -->
+        <div th:each="key : ${keys}" class="col-md-6 mb-4">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title" th:text="${key.email}">Email</h5>
@@ -77,12 +89,115 @@
                         <strong>Expiry Date:</strong> <span th:text="${key.expiry_date}">Expiry Date</span><br>
                         <strong>Status:</strong> <span th:text="${key.status}">Status</span>
                     </p>
-                    <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" th:href="@{/web/admin/revoke?(email=${key.email})}">Revoke</a>
+                    <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal"
+                       th:href="@{/web/admin/revoke?(email=${key.email})}">Revoke</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<script>
+    function searchKey(event) {
+        event.preventDefault(); // Prevent form from submitting traditionally
+        const searchInput = document.getElementById('searchInput').value;
+        const resultContainer = document.getElementById('search-result');
+        const keysContainer = document.getElementById('keys-container');
+
+        fetch(`/web/admin/search?search=${searchInput}`)
+            .then(response => {
+                if (response.status === 404) {
+                    throw new Error('User has no active key');
+                }
+                if (response.status ===400){
+                    throw new Error('Empty Search value');
+                }
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                resultContainer.style.display = 'none'; // Hide the previous result container
+
+                // Remove any previous active key card
+                const existingActiveKeyCard = document.getElementById('active-key-card');
+                if (existingActiveKeyCard) {
+                    existingActiveKeyCard.remove();
+                }
+
+                // Create a new card for the active key
+                const activeKeyCard = document.createElement('div');
+                activeKeyCard.id = 'active-key-card';
+                activeKeyCard.className = 'col-12 mb-4 active-key-card';
+                activeKeyCard.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">${data.email}</h5>
+                            <p class="card-text">
+                                <strong>Access Key:</strong> ${data.keyValue}<br>
+                                <strong>Procured Date:</strong> ${data.procured_date}<br>
+                                <strong>Expiry Date:</strong> ${data.expiry_date}<br>
+                                <strong>Status:</strong> ${data.status}
+                            </p>
+                            <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" href="/web/admin/revoke?email=${data.email}">Revoke</a>
+                        </div>
+                    </div>
+                `;
+                // Insert the new card at the top of the container
+                keysContainer.insertAdjacentElement('afterbegin', activeKeyCard);
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                resultContainer.style.display = 'block';
+                resultContainer.className = 'alert alert-danger';
+                resultContainer.innerHTML = error.message;
+            });
+    }
+
+    function sortKeys() {
+        const sortCriteria = document.getElementById('sortCriteria').value;
+        const resultContainer = document.getElementById('search-result');
+        const keysContainer = document.getElementById('keys-container');
+
+        fetch(`/web/admin/sort?sortBy=${sortCriteria}`)
+            .then(response => response.json())
+            .then(data => {
+                keysContainer.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(key => {
+                        const card = document.createElement('div');
+                        card.className = 'col-md-6 mb-4';
+                        card.innerHTML = `
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${key.email}</h5>
+                                    <p class="card-text">
+                                        <strong>Access Key:</strong> ${key.keyValue}<br>
+                                        <strong>Procured Date:</strong> ${key.procured_date}<br>
+                                        <strong>Expiry Date:</strong> ${key.expiry_date}<br>
+                                        <strong>Status:</strong> ${key.status}
+                                    </p>
+                                    <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" href="/web/admin/revoke?email=${key.email}">Revoke</a>
+                                </div>
+                            </div>
+                        `;
+                        keysContainer.appendChild(card);
+                    });
+                } else {
+                    resultContainer.style.display = 'block';
+                    resultContainer.className = 'alert alert-info';
+                    resultContainer.innerHTML = 'No keys found matching the criteria.';
+                }
+            })
+            .catch(error => {
+                resultContainer.style.display = 'block';
+                resultContainer.className = 'alert alert-danger';
+                resultContainer.innerHTML = 'Error fetching keys: ' + error.message;
+            });
+    }
+
+    document.getElementById('searchForm').addEventListener('submit', searchKey);
+</script>
 </body>
 </html>
