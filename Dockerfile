@@ -18,12 +18,11 @@ RUN chmod +x mvnw
 # Build the application
 RUN mvn clean package -DskipTests
 
-# The docker file
-#COPY target/accesskeymanager-0.0.1-SNAPSHOT.jar /app/accesskeymanager-0.0.1-SNAPSHOT.jar
-
+# Copy the packaged JAR file
+COPY target/accesskeymanager-0.0.1-SNAPSHOT.jar /app/accesskeymanager-0.0.1-SNAPSHOT.jar
 
 # Expose the port your application listens on
 EXPOSE 8080
 
 # Set the command to run the Spring Boot application
-CMD ["java", "-jar", "target/*.jar"]
+CMD ["java", "-jar", "accesskeymanager-0.0.1-SNAPSHOT.jar"]
