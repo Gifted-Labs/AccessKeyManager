@@ -8,7 +8,7 @@ RUN apt-get install -y openjdk-21-slim maven
 #FROM openjdk:21-jdk-slim
 
 # Install Maven
-RUN apt-get update && apt-get install -y maven
+#RUN apt-get update && apt-get install -y maven
 
 # Set the working directory
 WORKDIR /app
@@ -16,6 +16,8 @@ WORKDIR /app
 # Copy the application code
 COPY src ./src
 COPY pom.xml .
+
+COPY . .
 
 # Build the application
 RUN mvn clean package -DskipTests
