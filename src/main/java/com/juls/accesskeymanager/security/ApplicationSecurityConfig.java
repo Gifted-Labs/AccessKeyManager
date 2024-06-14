@@ -76,7 +76,7 @@ public class ApplicationSecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/public/**")
-                        .allowedMethods("GET", "POST","DELETE","PUT","REQUEST");
+                        .allowedMethods("GET", "POST","DELETE","PUT");
             }
         };
      }
