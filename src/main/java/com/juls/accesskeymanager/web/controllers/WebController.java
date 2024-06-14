@@ -42,7 +42,7 @@ public class WebController {
      private final AuthenticationManager authenticationManager;
 
 
-     @GetMapping("/login")
+     @PostMapping("/login")
     public String getLoginPage(){
         return "login";
     }
