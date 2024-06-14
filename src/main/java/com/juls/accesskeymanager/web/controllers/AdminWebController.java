@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,6 +33,7 @@ public class AdminWebController {
 
     private final AccessKeyService accessKeyService;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         try {
@@ -44,7 +46,7 @@ public class AdminWebController {
             return "error";
         }
     }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/revoke")
     public String revokeKey(@RequestParam("email") String email, Model model) {
         try {
@@ -59,7 +61,7 @@ public class AdminWebController {
         }
     }
 
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/sort")
     @ResponseBody
     public ResponseEntity<List<AccessKeyDetails>> sortKeys(@RequestParam("sortBy") String sortBy) {
@@ -67,6 +69,7 @@ public class AdminWebController {
         return new ResponseEntity<>(sortedKeys, HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/search")
     @ResponseBody
     public ResponseEntity<AccessKeyDetails> getActiveKey(@RequestParam("search") String search) {

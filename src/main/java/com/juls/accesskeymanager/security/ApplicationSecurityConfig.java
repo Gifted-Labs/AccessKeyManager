@@ -3,6 +3,7 @@ package com.juls.accesskeymanager.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -44,8 +45,8 @@ public class ApplicationSecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/public/**").permitAll()
                 .requestMatchers("/api/admin/**","/web/admin/**").hasAuthority("ADMIN")
-                .requestMatchers("/api/users/**","/web/users/**").hasAuthority("USER")
-                .anyRequest().authenticated()
+                            .requestMatchers("/api/users/**","/web/users/**").hasAuthority("USER")
+                .anyRequest().fullyAuthenticated()
                 )
                 .formLogin()
                 .loginPage("/public/login")
@@ -76,7 +77,7 @@ public class ApplicationSecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/public/**")
-                        .allowedMethods("GET", "POST","DELETE","PUT","REQUEST");
+                        .allowedMethods("GET", "POST","DELETE","PUT");
             }
         };
      }
