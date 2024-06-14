@@ -39,7 +39,6 @@ public class ApplicationSecurityConfig {
         
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.disable())
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/public/**").permitAll()
