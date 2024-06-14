@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,11 +16,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.juls.accesskeymanager.services.UsersDetailsService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+
 @RequiredArgsConstructor
 public class ApplicationSecurityConfig {
 
@@ -29,9 +30,9 @@ public class ApplicationSecurityConfig {
 
     
     /** 
-     * @param http
+     * @param http The Http Security to be returned
      * @return SecurityFilterChain
-     * @throws Exception
+     * @throws Exception It throws a Series of Exceptions
      */
     @SuppressWarnings("removal")
     @Bean
@@ -42,7 +43,6 @@ public class ApplicationSecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/public/**").permitAll()
-                            .requestMatchers("/public/documentation/**").permitAll()
                 .requestMatchers("/api/admin/**","/web/admin/**").hasAuthority("ADMIN")
                 .requestMatchers("/api/users/**","/web/users/**").hasAuthority("USER")
                 .anyRequest().authenticated()
@@ -70,6 +70,16 @@ public class ApplicationSecurityConfig {
      }
 
 
+     @Bean
+     public WebMvcConfigurer corsConfigurer(){
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/public/**")
+                        .allowedMethods("GET", "POST","DELETE","PUT","REQUEST");
+            }
+        };
+     }
 
     @Bean
     public AuthenticationManager authenticationManager() {

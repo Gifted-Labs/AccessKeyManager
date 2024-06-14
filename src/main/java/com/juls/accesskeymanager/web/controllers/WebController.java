@@ -42,17 +42,6 @@ public class WebController {
      private final AuthenticationManager authenticationManager;
 
 
-
-    @GetMapping("/home")
-    public String home(){
-        return "index";
-    }
-
-    @GetMapping("/documentation")
-    public String documentation(){
-        return "documentation/index";
-    }
-
      @GetMapping("/login")
     public String getLoginPage(){
         return "login";
