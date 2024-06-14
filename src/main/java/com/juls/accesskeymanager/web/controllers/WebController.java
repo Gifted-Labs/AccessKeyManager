@@ -41,7 +41,7 @@ public class WebController {
     public final ApplicationEventPublisher publisher;
      private final AuthenticationManager authenticationManager;
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public String getLoginPage(){
         return "login";
     }
