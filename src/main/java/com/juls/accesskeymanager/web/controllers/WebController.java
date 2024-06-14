@@ -42,7 +42,9 @@ public class WebController {
     public final ApplicationEventPublisher publisher;
      private final AuthenticationManager authenticationManager;
 
+
     @GetMapping("/login")
+
     public String getLoginPage(){
         return "login";
     }
