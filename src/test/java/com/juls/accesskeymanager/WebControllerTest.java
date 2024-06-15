@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 @RunWith(SpringRunner.class)
 @WebMvcTest(WebController.class)
-@ContextConfiguration(classes = {WebController.class, TestSecurityConfig.class})
+@ContextConfiguration(classes = {WebController.class})
 public class WebControllerTest {
 
     @Autowired

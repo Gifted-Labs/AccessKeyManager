@@ -1,11 +1,10 @@
-package com.juls.accesskeymanager;
+ls package com.juls.accesskeymanager;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.juls.accesskeymanager.data.models.*;
-import com.juls.accesskeymanager.security.TestSecurityConfig;
+import com.juls.accesskeymanager.data.models.*
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -27,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @WebMvcTest(AdminWebController.class)
-@ContextConfiguration(classes = {AdminWebController.class, TestSecurityConfig.class})
+@ContextConfiguration(classes = {AdminWebController.class})
 public class AdminWebControllerTest {
 
     @Autowired
