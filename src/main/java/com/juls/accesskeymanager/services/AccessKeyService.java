@@ -173,6 +173,8 @@ public class AccessKeyService {
     public boolean userHasActiveKey(String email){
         return getActiveKeyByEmail(email)!=null;
     }
+
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public AccessKeys generateKey(String email) throws BadRequestException {
         // Check if user already has an active key
