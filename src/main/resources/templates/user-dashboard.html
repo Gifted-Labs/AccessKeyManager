@@ -1,39 +1,87 @@
 <!DOCTYPE html>
-    <html lang="en" xmlns:th="http://www.thymeleaf.org">
-        <head>
-            <meta charset="UTF-8">
-            <title>USERNAME</title>
-        </head>
-        <body>
-            <form action="#" th:action=" @{/web/search}" method="get">
-                <input type="search" name="search" id="search">
-                <input type="submit" value="Search">
-            </form>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DASHBOARD - ACCESS KEY MANAGER</title>
+    <link rel="stylesheet" th:href="@{/css/userstyle.css}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-            <hr />
 
-            <table border="1">
-                <thead>
-                    <th>Email</th>
-                    <th>Access Key</th>
-                    <th>Procured Date</th>
-                    <th>Expiry Date</th>
-                    <th>Status</th>
-                </thead>
+  </head>
+  <body>
+    <div class="navbar">
+      <h1>USER Dashboard</h1>
+      <a th:href="@{/logout}" href="#" class="btn">Logout</a>
+    </div>
 
-                <tbody>
-                    <tr th:each = "key : ${keys}">
-                        <td th:text= "${key.email}">Email</td>
-                        <td th:text= "${key.keyValue}">Access Key</td>
-                        <td th:text= "${key.procured_date}">Procured Date</td>
-                        <td th:text= "${key.expiry_date}">Expiry Date</td>
-                        <td th:text= "${key.status}">Status</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="form-group">
+      <select class="form-control" id="sortCriteria" onchange="sortKeys()">
+        <option value="">Sort by...</option>
+        <option value="email">Email</option>
+        <option value="expiryDate">Expiry Date</option>
+        <option value="status">Status</option>
+      </select>
+    </div>
 
-            <hr />
-            <a href="#" th:href="@{/web/generate}">Generate</a>
-        </body>
 
-    </html>
+    <div class="container">
+      <div class="card-container">
+        <div class="card" th:each="key : ${keys}">
+          <h3 th:text="${key.email}"></h3>
+          <p><strong>Access Key:</strong> <span th:text="${key.keyValue}"></span></p>
+          <p><strong>Procured Date:</strong> <span th:text="${key.procured_date}"></span></p>
+          <p><strong>Expiry Date:</strong> <span th:text="${key.expiry_date}"></span></p>
+          <p><strong>Status:</strong> <span th:text="${key.status}"></span></p>
+        </div>
+      </div>
+
+      <form action="#" th:action="@{/web/users/generate}" method="post" class="generate-form">
+        <button type="submit" class="btn">Generate</button>
+      </form>
+    </div>
+
+    <script th:src="@{/js/script.js}" src="">
+      function sortKeys() {
+        const sortCriteria = document.getElementById('sortCriteria').value;
+        const resultContainer = document.getElementById('search-result');
+        const keysContainer = document.getElementById('keys-container');
+
+        fetch(`/web/admin/sort?sortBy=${sortCriteria}`)
+                .then(response => response.json())
+                .then(data => {
+                  keysContainer.innerHTML = '';
+                  if (data.length > 0) {
+                    data.forEach(key => {
+                      const card = document.createElement('div');
+                      card.className = 'col-md-6 mb-4';
+                      card.innerHTML = `
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${key.email}</h5>
+                                    <p class="card-text">
+                                        <strong>Access Key:</strong> ${key.keyValue}<br>
+                                        <strong>Procured Date:</strong> ${key.procured_date}<br>
+                                        <strong>Expiry Date:</strong> ${key.expiry_date}<br>
+                                        <strong>Status:</strong> ${key.status}
+                                    </p>
+                                    <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" href="/web/admin/revoke?email=${key.email}">Revoke</a>
+                                </div>
+                            </div>
+                        `;
+                      keysContainer.appendChild(card);
+                    });
+                  } else {
+                    resultContainer.style.display = 'block';
+                    resultContainer.className = 'alert alert-info';
+                    resultContainer.innerHTML = 'No keys found matching the criteria.';
+                  }
+                })
+                .catch(error => {
+                  resultContainer.style.display = 'block';
+                  resultContainer.className = 'alert alert-danger';
+                  resultContainer.innerHTML = 'Error fetching keys: ' + error.message;
+                });
+      }
+    </script>
+  </body>
+</html>

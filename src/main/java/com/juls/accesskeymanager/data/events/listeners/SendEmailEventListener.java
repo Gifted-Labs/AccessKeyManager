@@ -18,6 +18,10 @@ public class SendEmailEventListener implements ApplicationListener<SendEmailEven
     @Autowired
     private  EmailService emailService;
 
+    
+    /** 
+     * @param event
+     */
     @Override
     public void onApplicationEvent(SendEmailEvent event){
 

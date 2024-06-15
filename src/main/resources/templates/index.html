@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.thymeleaf.org ">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" th:href="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css}">
+</head>
+<body>
+<div id="container">
+    <div id="header">
+        <div id="navbar">
+            <h1>MICRO FOCUS</h1>
+            <ul>
+                <li><a th:href="@{/about}" href="#"> About</a></li>
+                <li><a href="#" th:href="@{/public/login}">Login</a></li>
+                <li><a href="#" th:href="@{/public/register}"> Register</a></li>
+                <li><a href="documentation/index.htm" th:href="@{/public/documentation}">api Documentation</a> </li>
+            </ul>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<script th:src="@{https://code.jquery.com/jquery-3.2.1.slim.min.js}"></script>
+<script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js}"></script>
+<script th:src="@{https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
+</body>
+</html>

@@ -28,19 +28,28 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/register")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class UserWebController {
+public class AuthController {
     
     private final UserServiceImpl userService;
     private final ApplicationEventPublisher publisher;
     
 
-    @PostMapping
+    
+    /** 
+     * @param authenticationRequest
+     * @param request
+     * @return ResponseEntity<String>
+     */
+
+    
+    @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody AuthenticationRequest authenticationRequest, final HttpServletRequest request){
         try {
             Users user = this.userService.registerUser(authenticationRequest);
-            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request))); 
+            String requestType = "api";
+            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request),requestType)); 
             new ResponseEntity<>(HttpStatus.ACCEPTED);
             return ResponseEntity.ok("User registered successfully"); 
         } catch (Exception e) {
@@ -53,7 +62,8 @@ public class UserWebController {
     public ResponseEntity<String> resendVerificationToken(@RequestParam("email") String email, final HttpServletRequest request){
         try {
             var user = this.userService.checkUser(email);
-            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request)));
+            String requestType = "api";
+            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request),requestType));
             new ResponseEntity<>(HttpStatus.OK);
             return ResponseEntity.ok("Token has been resent to your email");
         }
@@ -67,7 +77,7 @@ public class UserWebController {
         public ResponseEntity<String> resendReset(@RequestParam(value = "email")String email, final HttpServletRequest request) throws NotFoundException{
             try {
                 if (this.userService.verifyUser(email)){
-                String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request));
+                String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request),"api");
                 log.info("Click on the following link to reset your password: {}",resetLink);
                 return ResponseEntity.ok().body("Reset Request has been sent to your email successfulyy");
             }
@@ -111,7 +121,7 @@ public class UserWebController {
     @PostMapping("/reset")
     public ResponseEntity<String> resetInit(@RequestParam(value = "email")String email, final HttpServletRequest request) throws NotFoundException{
         try {
-            String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request));
+            String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request),"api");
             log.info("Click on the following link to reset your password: {}",resetLink);
             return ResponseEntity.ok().body("Reset Request has been sent to your email successfulyy");
         } catch (Exception e) {
@@ -133,13 +143,14 @@ public class UserWebController {
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-
+    
+    
     
     @GetMapping("/update")
-    public ResponseEntity<String> updatePassword(@RequestParam("password")String password, @RequestParam("token") String token){
+    public ResponseEntity<String> updatePassword(@RequestParam("password")String password, @RequestParam("confirm") String confirm, @RequestParam("token") String token){
         try {
             String email = this.userService.getUserByToken(token).getEmail();
-            boolean isUpdated = this.userService.updatePassword(token, password);
+            boolean isUpdated = this.userService.updatePassword(email, password,confirm);
             if (isUpdated){
                 new ResponseEntity<>(HttpStatus.OK);
                 return ResponseEntity.ok().body("Password updated successfully. Login with your new password");
@@ -151,11 +162,4 @@ public class UserWebController {
         }
         return null;
     }
-    
-    @PostMapping("/resendToken")
-    public String checkSomething(){
-        return "I am checking something";
-    }
-
-
 }

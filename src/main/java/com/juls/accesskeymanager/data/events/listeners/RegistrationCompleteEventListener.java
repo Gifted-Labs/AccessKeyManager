@@ -26,6 +26,10 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
 
 
 
+    
+    /** 
+     * @param event
+     */
     @Override
     @Transactional 
     public void onApplicationEvent(@SuppressWarnings("null") RegistrationCompleteEvent event){
@@ -41,8 +45,17 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         //3. Save the verification token for the user.
         this.userService.saveVerificationToken(user, verificationToken );
 
+        //4. Get the right requestType and generate the right url
+
+        String url = "";
+        if (event.getRequestType().equalsIgnoreCase("api")){
+            url = event.getApplicationUrl()+"/api/auth/verifyuser?token="+verificationToken;
+        }
+        else if (event.getRequestType().equalsIgnoreCase("web")){
+            url = event.getApplicationUrl()+"/public/verification?token="+verificationToken;
+        }
+
         //4. Build the applicationUrl;
-        String url = event.getApplicationUrl()+"/register/verifyuser?token="+verificationToken;
 
 
         // 5. Send the email;

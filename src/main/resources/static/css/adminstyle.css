@@ -1,0 +1,92 @@
+/* General Page Styles */
+body {
+    background-color: #f8f9fa; /* Light grey background */
+    font-family: 'Arial', sans-serif;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: #007bff; /* Blue background for the navbar */
+    color: #fff;
+}
+
+.navbar-brand, .nav-link {
+    color: #fff !important;
+}
+
+.nav-link:hover {
+    color: #cce5ff !important; /* Light blue on hover */
+}
+
+/* Search Bar Styles */
+.form-group {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.search {
+    width: 50%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+
+.btn-primary {
+    margin-left: 10px;
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.2em;
+    color: #007bff; /* Matching the navbar color */
+    margin-bottom: 15px;
+}
+
+.card-text {
+    color: #495057; /* Dark grey text */
+}
+
+.revoke-btn {
+    margin-top: 10px;
+    background-color: #dc3545; /* Red revoke button */
+    border: none;
+    color: #fff;
+}
+
+.revoke-btn:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+/* Alert Styles */
+.alert {
+    display: none;
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+    .search {
+        width: 80%;
+    }
+}
+
+@media (min-width: 768px) {
+    .col-md-6 {
+        margin-bottom: 30px;
+    }
+}

@@ -14,6 +14,10 @@ public class Password {
         }
     }
 
+    
+    /** 
+     * @return String
+     */
     public String getMainPass(){
         return this.mainPass;
     }

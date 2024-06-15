@@ -1,0 +1,13 @@
+com.juls.accesskeymanager
+com.juls.accesskeymanager.controller
+com.juls.accesskeymanager.data.authentication
+com.juls.accesskeymanager.data.events
+com.juls.accesskeymanager.data.events.listeners
+com.juls.accesskeymanager.data.models
+com.juls.accesskeymanager.data.repository
+com.juls.accesskeymanager.data.token
+com.juls.accesskeymanager.exceptions
+com.juls.accesskeymanager.scheduler
+com.juls.accesskeymanager.security
+com.juls.accesskeymanager.services
+com.juls.accesskeymanager.web.controllers

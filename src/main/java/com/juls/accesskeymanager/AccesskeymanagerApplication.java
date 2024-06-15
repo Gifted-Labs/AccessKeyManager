@@ -8,8 +8,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class AccesskeymanagerApplication {
 
+	
+	/** 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(AccesskeymanagerApplication.class, args);
-	}
-
+	} 
 }

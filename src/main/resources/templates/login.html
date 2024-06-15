@@ -2,26 +2,232 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <title>LOGIN - ACCESS KEY MANAGER</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+        }
+
+        .wrapper {
+            position: relative;
+            background: #fff;
+            padding: 30px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .wrapper header {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 35px;
+            color: #333;
+        }
+
+        .wrapper .logo {
+            font-size: 50px;
+            color: #43cea2;
+            margin-bottom: 10px;
+        }
+
+        .wrapper form {
+            width: 100%;
+        }
+
+        .field {
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 15px 20px;
+            padding-left: 40px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            transition: border-color 0.3s;
+        }
+
+        .field input:focus {
+            border-color: #43cea2;
+            outline: none;
+        }
+
+        .field i {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #aaa;
+            transition: color 0.3s;
+        }
+
+        .field input:focus ~ i {
+            color: #43cea2;
+        }
+
+        .error {
+            display: none;
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .field.error input {
+            border-color: #dc3545;
+        }
+
+        .field.error i {
+            color: #dc3545;
+        }
+
+        .pass-txt {
+            text-align: left;
+            margin-top: -10px;
+            margin-bottom: 20px;
+            margin-left: 5px;
+        }
+
+        .pass-txt a {
+            color: #43cea2;
+            text-decoration: none;
+        }
+
+        .pass-txt a:hover {
+            text-decoration: underline;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            color: #fff;
+            background: #43cea2;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background: #185a9d;
+        }
+
+        .sign-txt {
+            margin-top: 20px;
+        }
+
+        .sign-txt a {
+            color: #43cea2;
+            text-decoration: none;
+        }
+
+        .sign-txt a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            position: fixed;
+            top: 10px;
+            left: 42vw;
+            background: #dc3545;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .alert.success {
+            background: #28a745;
+        }
+    </style>
 </head>
 <body>
-    <h1>Please Login</h1>
-        <div th:if="${param.error}">Invalid Username and Password</div>
-        <div th:if="${param.logout}">You have been logged out</div>
-        
-    
-    <form action="#" th:action="@{/login}" method="post">
-        
-        <label for="username">Username: 
-            <input type="text" name="username" id="username" placeholder="username">
-        </label>
-
-        <label for="password">Password: 
-            <input type="password" name="password" placeholder="password">
-        </label>
+<div class="wrapper">
+    <div class="logo">
+        <i class="fas fa-key"></i>
+    </div>
+    <header>AccessKey Manager</header>
+    <form id="loginForm" th:action="@{/public/login}" method="post">
+        <div class="field email">
+            <div class="input-area">
+                <input type="email" id="username" name="username" placeholder="Email Address" required>
+                <i class="icon fas fa-envelope"></i>
+            </div>
+        </div>
+        <div class="field password">
+            <div class="input-area">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <i class="icon fas fa-lock"></i>
+            </div>
+        </div>
+        <div class="pass-txt"><a th:href="@{/public/reset}">Forgot password?</a></div>
+        <div th:if="${param.error}" class="error">
+            Invalid username or password.
+        </div>
 
         <input type="submit" value="Login">
     </form>
+    <div class="sign-txt">Not yet a member? <a href="/public/register">Signup now</a></div>
+</div>
+
+<div class="alert" id="alert"></div>
+
+<!-- Custom JS for validation and alerts -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('error')) {
+            showAlert('Invalid username or password.', 'error');
+        }
+        if (urlParams.has('logout')) {
+            showAlert('You have been logged out.', 'success');
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (!username) {
+                event.preventDefault();
+                showAlert('Email can\'t be blank', 'error');
+            } else if (!password) {
+                event.preventDefault();
+                showAlert('Password can\'t be blank', 'error');
+            }
+        });
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alert');
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type}`;
+            alertBox.style.display = 'block';
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 3000);
+        }
+    });
+</script>
 </body>
 </html>
