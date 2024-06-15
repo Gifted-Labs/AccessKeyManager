@@ -31,6 +31,17 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
+
+/**
+ * Controller class for handling web-related operations such as user registration, verification,
+ * password reset, and related functionalities.
+ * <p>
+ * This controller integrates with services for user management and publishes events for registration
+ * and verification processes.
+ *
+ * @author Julius Adjetey Sowah
+ */
+
 @Slf4j
 @Controller
 @RequestMapping("/public")
@@ -57,28 +68,46 @@ public class WebController {
         return "register";
     }
 
+
+    /**
+     * Registers a new user with the provided authentication request details.
+     *
+     * @param authenticationRequest the user authentication details.
+     * @param model the model to pass attributes to the view.
+     * @param request the HTTP request object.
+     * @return a redirect URL based on the registration result.
+     */
     @PostMapping("/registeruser")
-    public String addUser(@ModelAttribute AuthenticationRequest authenticationRequest,Model model, final HttpServletRequest request){
+    public String addUser(@ModelAttribute AuthenticationRequest authenticationRequest, Model model, final HttpServletRequest request){
         try {
             var user = this.userService.registerUser(authenticationRequest);
             String requestType = "web";
-            this.publisher.publishEvent(new RegistrationCompleteEvent(user,applicationUrl(request),requestType));
-            return "redirect:/public/registration-success?email="+authenticationRequest.email();  
-        }
-        catch (Exception e){
-            log.info("The error message {}",e.getMessage());
-            new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            model.addAttribute("error", e.getMessage());
-            return "error";
-            
+            this.publisher.publishEvent(new RegistrationCompleteEvent(user, applicationUrl(request), requestType));
+            return "redirect:/public/registration-success?email=" + authenticationRequest.email();
+        } catch (Exception e) {
+            log.info("The error message {}", e.getMessage());
+            return "redirect:/public/register?error=" + e.getMessage();
         }
     }
 
+    /**
+     * Constructs the application URL from the HTTP request.
+     *
+     * @param request the HTTP request object.
+     * @return the application URL.
+     */
     private String applicationUrl(HttpServletRequest request){
         String url = String.format("http://%s:%s%s",request.getServerName(),request.getServerPort(),request.getContextPath());
         return url;
     }
 
+    /**
+     * Verifies a user using the provided token.
+     *
+     * @param token the verification token.
+     * @param model the model to pass attributes to the view.
+     * @return the view name based on the verification result.
+     */
     @GetMapping("/verification")
     public String verification(@RequestParam("token") String token, Model model){
         try {
@@ -101,13 +130,30 @@ public class WebController {
 
 
 
+    /**
+     * Handles GET requests for the password reset page.
+     *
+     * @return the reset password page view name.
+     */
     @GetMapping("/reset")
     public String forgotPassword(){
         return "resetpassword";
     }
 
+
+
+    /**
+     * Initiates the password reset process for the specified email.
+     *
+     * @param email the email address of the user.
+     * @param request the HTTP request object.
+     * @param model the model to pass attributes to the view.
+     * @return the view name based on the reset process result.
+     * @throws NotFoundException if the user is not found.
+     */
     @PostMapping("/reset")
-    public String resetPassword(@RequestParam String email, final HttpServletRequest request, Model model) throws NotFoundException{
+    public String resetPassword(@RequestParam String email, final HttpServletRequest request, Model model)
+            throws NotFoundException{
         try {
             String resetLink = this.userService.resetPasswordInit(email, applicationUrl(request),"web");
             model.addAttribute("message","Verification has been resent to your email successfully");
@@ -124,12 +170,27 @@ public class WebController {
 
 
 
-
+    /**
+     * Handles GET requests for the registration success page.
+     *
+     * @param model the model to pass attributes to the view.
+     * @return the registration success page view name.
+     */
     @GetMapping("/registration-success")
     public String registrationSuccess(Model model){
             return "registration-success";
     }
 
+
+    /**
+     * Resends the verification email to the specified user.
+     *
+     * @param email the email address of the user.
+     * @param model the model to pass attributes to the view.
+     * @param request the HTTP request object.
+     * @return the view name based on the resend verification process result.
+     * @throws NotFoundException if the user is not found.
+     */
     @RequestMapping("/resend")
     public String resendVerification(@RequestParam("email") String email, Model model, final HttpServletRequest request) throws NotFoundException{
         try {
@@ -146,6 +207,13 @@ public class WebController {
         }
     }
 
+    /**
+     * Verifies a user with the provided token.
+     *
+     * @param token the verification token.
+     * @param model the model to pass attributes to the view.
+     * @return the view name based on the verification result.
+     */
     @PostMapping("/verifyuser")
     public String verifyUser(@RequestParam("token") String token, Model model){
         try {
@@ -158,6 +226,14 @@ public class WebController {
         }
     }
 
+
+    /**
+     * Handles GET requests for resetting the password with the provided token.
+     *
+     * @param token the reset token.
+     * @param model the model to pass attributes to the view.
+     * @return the view name based on the reset token validation.
+     */
     @GetMapping("/resetPassword")
     public String resetPass(@RequestParam("token") String token, Model model){
         try {
@@ -176,6 +252,15 @@ public class WebController {
         }
     }
 
+    /**
+     * Updates the user's password with the provided new password and confirmation.
+     *
+     * @param password the new password.
+     * @param confirm the confirmation of the new password.
+     * @param email the email address of the user.
+     * @param model the model to pass attributes to the view.
+     * @return the view name based on the password update result.
+     */
     @PostMapping("/updatePassword")
     public String updatePassword(@RequestParam("password")String password, @RequestParam("confirm") String confirm,@RequestParam("email") String email, Model model){
         try {
