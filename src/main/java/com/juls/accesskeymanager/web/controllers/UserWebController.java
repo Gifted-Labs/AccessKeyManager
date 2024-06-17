@@ -42,15 +42,14 @@ public class UserWebController  {
 
 
     @PostMapping("/generate")
-    public String generate(Authentication authentication, Model model){
+    public String generate(Authentication authentication){
         try {
             String email = authentication.getName();
             this.accessKeyService.generateKey(email);
             return "redirect:/web/users";
         } catch (Exception e) {
             log.debug("Error info: {}",e.getMessage());
-            model.addAttribute("error", e.getMessage());
-            return "error";
+            return "redirect:/web/users?error="+e.getMessage();
         }
     }
     

@@ -15,8 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SendEmailEventListener implements ApplicationListener<SendEmailEvent> {
 
-    @Autowired
-    private  EmailService emailService;
+    private final EmailService emailService;
 
     
     /** 

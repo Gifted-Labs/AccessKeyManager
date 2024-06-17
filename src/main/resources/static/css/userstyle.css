@@ -3,7 +3,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-image: linear-gradient(to bottom right, #6a2c70, #c96567);
+    background-image: linear-gradient(to bottom right,#43cea2, #185a9d);
     background-size: cover;
     background-repeat: no-repeat;
     min-height: 100vh;
@@ -90,8 +90,30 @@ body {
   .generate-form .btn:hover {
     background-color: #b45b5d;
   }
-  
-  /* Responsive Styles */
+
+
+.alert {
+  font-family: "Poppins", sans-serif;
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  width: 400px;
+  transform: translateX(-50%);
+  background: #dc3545;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  display: none;
+  z-index: 1000;
+}
+
+.alert.success {
+  background: #28a745;
+}
+
+
+/* Responsive Styles */
   @media (max-width: 768px) {
     .card-container {
       grid-template-columns: 1fr;

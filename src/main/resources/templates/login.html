@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>LOGIN - ACCESS KEY MANAGER</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
@@ -22,6 +21,9 @@
             align-items: center;
             height: 100vh;
             background: linear-gradient(135deg, #43cea2, #185a9d);
+            margin: 0;
+            padding: 0;
+            color: #333;
         }
 
         .wrapper {
@@ -157,41 +159,80 @@
             border-radius: 5px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             display: none;
+            z-index: 1000;
         }
 
         .alert.success {
             background: #28a745;
         }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            50% {
+                transform: translateX(5px);
+            }
+            75% {
+                transform: translateX(-5px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: auto;
+            padding: 20px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.3);
+            width: 100%;
+            position: relative;
+            bottom: 0;
+            left: 0;
+        }
+
     </style>
 </head>
 <body>
-<div class="wrapper">
+<div class="wrapper shake">
     <div class="logo">
         <i class="fas fa-key"></i>
     </div>
     <header>AccessKey Manager</header>
-    <form id="loginForm" th:action="@{/public/login}" method="post">
+    <form id="loginForm" action="/public/login" method="post">
         <div class="field email">
             <div class="input-area">
                 <input type="email" id="username" name="username" placeholder="Email Address" required>
                 <i class="icon fas fa-envelope"></i>
             </div>
+            <div class="error">Email can't be blank</div>
         </div>
         <div class="field password">
             <div class="input-area">
                 <input type="password" id="password" name="password" placeholder="Password" required>
                 <i class="icon fas fa-lock"></i>
             </div>
+            <div class="error">Password can't be blank</div>
         </div>
-        <div class="pass-txt"><a th:href="@{/public/reset}">Forgot password?</a></div>
+        <div class="pass-txt"><a href="/public/reset">Forgot password?</a></div>
         <div th:if="${param.error}" class="error">
             Invalid username or password.
         </div>
-
         <input type="submit" value="Login">
     </form>
     <div class="sign-txt">Not yet a member? <a href="/public/register">Signup now</a></div>
 </div>
+
+<!-- Footer -->
+<footer>
+    &copy; Gifted Labs Inc Access KeyManager 2024
+</footer>
 
 <div class="alert" id="alert"></div>
 
@@ -201,9 +242,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('error')) {
             showAlert('Invalid username or password.', 'error');
-        }
-        if (urlParams.has('logout')) {
-            showAlert('You have been logged out.', 'success');
+            shakeForm();
         }
 
         document.getElementById('loginForm').addEventListener('submit', function(event) {
@@ -212,9 +251,11 @@
             if (!username) {
                 event.preventDefault();
                 showAlert('Email can\'t be blank', 'error');
+                shakeForm();
             } else if (!password) {
                 event.preventDefault();
                 showAlert('Password can\'t be blank', 'error');
+                shakeForm();
             }
         });
 
@@ -227,7 +268,16 @@
                 alertBox.style.display = 'none';
             }, 3000);
         }
+
+        function shakeForm() {
+            const form = document.querySelector('.wrapper');
+            form.classList.add('shake');
+            setTimeout(() => {
+                form.classList.remove('shake');
+            }, 1000);
+        }
     });
 </script>
+
 </body>
 </html>

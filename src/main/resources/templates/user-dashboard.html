@@ -13,17 +13,7 @@
       <h1>USER Dashboard</h1>
       <a th:href="@{/logout}" href="#" class="btn">Logout</a>
     </div>
-
-    <div class="form-group">
-      <select class="form-control" id="sortCriteria" onchange="sortKeys()">
-        <option value="">Sort by...</option>
-        <option value="email">Email</option>
-        <option value="expiryDate">Expiry Date</option>
-        <option value="status">Status</option>
-      </select>
-    </div>
-
-
+    <div id="search-result" class="alert alert-info mt-2" style="display: none;"></div>
     <div class="container">
       <div class="card-container">
         <div class="card" th:each="key : ${keys}">
@@ -40,48 +30,27 @@
       </form>
     </div>
 
-    <script th:src="@{/js/script.js}" src="">
-      function sortKeys() {
-        const sortCriteria = document.getElementById('sortCriteria').value;
-        const resultContainer = document.getElementById('search-result');
-        const keysContainer = document.getElementById('keys-container');
 
-        fetch(`/web/admin/sort?sortBy=${sortCriteria}`)
-                .then(response => response.json())
-                .then(data => {
-                  keysContainer.innerHTML = '';
-                  if (data.length > 0) {
-                    data.forEach(key => {
-                      const card = document.createElement('div');
-                      card.className = 'col-md-6 mb-4';
-                      card.innerHTML = `
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">${key.email}</h5>
-                                    <p class="card-text">
-                                        <strong>Access Key:</strong> ${key.keyValue}<br>
-                                        <strong>Procured Date:</strong> ${key.procured_date}<br>
-                                        <strong>Expiry Date:</strong> ${key.expiry_date}<br>
-                                        <strong>Status:</strong> ${key.status}
-                                    </p>
-                                    <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" href="/web/admin/revoke?email=${key.email}">Revoke</a>
-                                </div>
-                            </div>
-                        `;
-                      keysContainer.appendChild(card);
-                    });
-                  } else {
-                    resultContainer.style.display = 'block';
-                    resultContainer.className = 'alert alert-info';
-                    resultContainer.innerHTML = 'No keys found matching the criteria.';
-                  }
-                })
-                .catch(error => {
-                  resultContainer.style.display = 'block';
-                  resultContainer.className = 'alert alert-danger';
-                  resultContainer.innerHTML = 'Error fetching keys: ' + error.message;
-                });
+    <script>
+
+      document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('error')){
+          showAlert(urlParams.get('error'),'error');
+        }
+
+      })
+
+      function showAlert(message, type) {
+        const alertBox = document.getElementById('alert');
+        alertBox.textContent = message;
+        alertBox.className = `alert ${type}`;
+        alertBox.style.display = 'block';
+        setTimeout(() => {
+          alertBox.style.display = 'none';
+        }, 4000);
       }
+
     </script>
   </body>
 </html>

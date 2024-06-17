@@ -5,7 +5,12 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +35,7 @@ import static java.util.stream.Collectors.toList;
  * It makes use of the accessKeyRepo and userService classes to perform it's operations.
  */
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AccessKeyService {
@@ -119,6 +125,23 @@ public class AccessKeyService {
         return this.accessKeyRepo.findByStatusAndUser(status,user);
     }
 
+    public Page <AccessKeyDetails> getAllAccessKeyDetails(int page, int size){
+        Pageable pageable = PageRequest.of(page -1, size);
+        Page<AccessKeys> accessKeysPage = accessKeyRepo.findAll(pageable);
+        return accessKeysPage.map(this::convertToAccessKeyDetails);
+    }
+
+    private AccessKeyDetails convertToAccessKeyDetails(AccessKeys accessKeys){
+        AccessKeyDetails keyDetails = new AccessKeyDetails();
+        keyDetails.setEmail(accessKeys.getUser().getEmail());
+        keyDetails.setKeyValue(accessKeys.getKeyValue());
+        keyDetails.setStatus(accessKeys.getStatus());
+        keyDetails.setProcured_date(accessKeys.getProcuredDate());
+        keyDetails.setExpiry_date(accessKeys.getExpiryDate());
+
+        return keyDetails;
+    }
+
     public List<AccessKeyDetails> sortKeys(String sortBy) {
         List<AccessKeyDetails> allKeys = new ArrayList<>(getAllAccessKeys());
 
@@ -139,25 +162,21 @@ public class AccessKeyService {
         return allKeys;
     }
 
-
-
-    public AccessKeys revokeKey(String email) throws BadRequestException {
-        Optional<AccessKeys> accessKey = this.getActiveKeyByStatus(email);
-
-        if (accessKey.isPresent()) {
-            if (accessKey.get().getStatus() == Status.EXPIRED || accessKey.get().getStatus() == Status.REVOKED) {
-                throw new BadRequestException("You cannot revoke this key");
-            }
-
+    @Transactional
+    public AccessKeys revokeKey(String email){
+        try{
+            log.info("The error for the key {}",email);
+            // Get the key of the user.
+            var accessKey = this.accessKeyRepo.findByStatusAndUser(Status.ACTIVE,this.userService.getUserByEmail(email));
+            log.info("This is the key value {}",accessKey.get().getKeyValue());
+            accessKey.get().setStatus(Status.REVOKED);
+            return this.accessKeyRepo.save(accessKey.get());
         }
-        else if(accessKey.isEmpty()){
-            throw new BadRequestException("No Access Key found");
+        catch (Exception e){
+            log.info(e.getMessage());
+            return null;
         }
-        accessKey.get().setStatus(Status.REVOKED);
-        return this.accessKeyRepo.save(accessKey.get());
-
     }
-
 
     private AccessKeys generatAccessKeys(String email){
         Date currentDate = new Date(System.currentTimeMillis());

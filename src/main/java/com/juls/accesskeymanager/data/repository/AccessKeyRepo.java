@@ -8,6 +8,7 @@ import com.juls.accesskeymanager.data.models.Users;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.juls.accesskeymanager.data.models.AccessKeys;
+import org.springframework.data.jpa.repository.Query;
 
 public interface AccessKeyRepo extends JpaRepository<AccessKeys, Long> {
     

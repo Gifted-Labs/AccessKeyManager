@@ -29,12 +29,14 @@
         .wrapper {
             background: #fff;
             padding: 30px 25px;
-            border-radius: 10px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
             max-width: 400px;
             width: 100%;
             margin: 20px auto;
+            border-radius: 15px;
+            position: relative;
+            bottom: 10px;
         }
 
         .wrapper header {
@@ -46,12 +48,14 @@
 
         .wrapper .logo {
             font-size: 50px;
-            color: #43cea2;
-            margin-bottom: 10px;
-            border: 2px solid #43cea2;
-            border-radius: 10px; /* Equal border radius */
-            display: inline-block;
+            color: #fff;
+            margin-bottom: 20px;
+            background: #43cea2;
             padding: 20px;
+            margin: 0 auto;
+            width: 100px;
+            border-radius: 100%;
+            margin-bottom: 20px;
         }
 
         .wrapper form {
@@ -62,15 +66,21 @@
         .field {
             position: relative;
             margin-bottom: 20px;
+
         }
 
         .field input {
             width: calc(100% - 40px);
-            padding: 15px 20px;
+            padding: 15px 30px;
             font-size: 16px;
             border-radius: 5px;
             border: 1px solid #ccc;
             transition: border-color 0.3s;
+        }
+
+        .field .icon{
+            position: relative;
+            left: 30px;
         }
 
         .field input:focus {
@@ -94,7 +104,9 @@
         }
 
         input[type="submit"] {
-            width: 100%;
+            width: calc(100% - 40px);
+            position: relative;
+            left: 20px;
             padding: 15px;
             font-size: 16px;
             color: #fff;
@@ -167,7 +179,7 @@
             color: #fff;
             background: rgba(0, 0, 0, 0.3);
             width: 100%;
-            position: fixed;
+            position: relative;
             bottom: 0;
             left: 0;
         }
@@ -194,30 +206,30 @@
     </style>
 </head>
 <body>
-<div class="wrapper">
+<div class="wrapper shake">
     <div class="logo">
-        <i class="fas fa-key"></i>
+        <i class="fas fa-key" style="color: #fff;"></i>
     </div>
     <header>Registration Form</header>
     <form id="registerForm" th:action="@{/public/registeruser}" method="post">
         <div class="field email">
             <div class="input-area">
-                <input type="text" name="email" id="email" placeholder="Email Address" required>
                 <i class="icon fas fa-envelope"></i>
+                <input type="text" name="email" id="email" placeholder="Email Address" required>
             </div>
             <div class="error">Email can't be blank</div>
         </div>
         <div class="field password">
             <div class="input-area">
-                <input type="password" name="password" id="password" placeholder="Password" required>
                 <i class="icon fas fa-lock"></i>
+                <input type="password" name="password" id="password" placeholder="Password" required>
             </div>
             <div class="error">Password can't be blank</div>
         </div>
         <div class="field password">
             <div class="input-area">
-                <input type="password" name="confirm" id="confirm" placeholder="Confirm Password" required>
                 <i class="icon fas fa-lock"></i>
+                <input type="password" name="confirm" id="confirm" placeholder="Confirm Password" required>
             </div>
             <div class="error">Confirmation password can't be blank</div>
         </div>
@@ -228,11 +240,6 @@
 
 <!-- Alert Box -->
 <div id="alert" class="alert"></div>
-
-<!-- Footer -->
-<footer>
-    &copy; Gifted Labs Inc Access KeyManager 2024
-</footer>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -253,10 +260,13 @@
                 shakeForm();
             } else if (password !== confirm) {
                 event.preventDefault();
-                document.getElementById('confirm').classList.add('error');
+                // document.getElementById('confirm').classList.add('error');
+                showAlert('Passwords do not match','error');
                 shakeForm();
             }
         });
+
+
 
         document.getElementById('confirm').addEventListener('input', function() {
             const password = document.getElementById('password').value;
@@ -271,6 +281,8 @@
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
         }
+
+
 
         function showAlert(message, type) {
             const alertBox = document.getElementById('alert');
