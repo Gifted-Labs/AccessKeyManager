@@ -67,13 +67,32 @@ public class AdminWebController {
         return "admin-board";
     }
 
-    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/revoke")
-    public String revokeKey(@RequestParam("email") String email, Model model) throws BadRequestException {
-        System.out.println("This is the email "+email +"...");
-        log.info("This is the email : {}",email);
-            accessKeyService.revokeKey(email);
-        return "redirect:/web/admin/dashboard";
+    @GetMapping("/sayhello")
+    public String sayhello(@RequestParam("email")String email, @RequestParam("keyValue") String keyValue, Model model) throws Exception{
+        try{
+            accessKeyService.revoke(email,keyValue);
+            model.addAttribute("error", email+"'s key revoked successfully");
+            return "error";
+        }
+        catch (Exception e){
+            model.addAttribute("error",e.getMessage());
+            return "error";
+        }
+    }
+
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    @GetMapping("/revoke")
+//    public String revokeKey(@RequestParam("email") String email, Model model) throws BadRequestException {
+//        System.out.println("This is the email "+email +"...");
+//        log.info("This is the email : {}",email);
+//            accessKeyService.revokeKey(email);
+//        return "redirect:/web/admin/dashboard";
+//    }
+
+    @GetMapping("/revokeKey")
+    public String revoke(@RequestParam("email") String email, Model model){
+        log.info("The email of the user is: {}",email);
+        return "redirect:/web/admin/dashoard";
     }
 
 //    @PreAuthorize("hasAuthority('ADMIN')")

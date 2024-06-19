@@ -77,6 +77,7 @@ public class AccessKeyServiceTest {
         // Mock dependencies
         String userEmail = "test@example.com";
         AccessKeys activeKey = new AccessKeys();
+        activeKey.setKeyValue("HelloWorld");
         activeKey.setStatus(Status.ACTIVE);
         when(accessKeyRepo.findByStatusAndUser(Status.ACTIVE, userService.getUserByEmail(userEmail)))
                 .thenReturn(Optional.of(activeKey));

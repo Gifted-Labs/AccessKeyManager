@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.juls.accesskeymanager.exceptions.NotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -53,18 +55,8 @@ public class AccessKeyService {
 
     public List<AccessKeyDetails> getAllAccessKeys(){
         List <AccessKeys> accessKeys = this.accessKeyRepo.findAll();
-        Map <Long, AccessKeyDetails> keyDetails = new HashMap<>();
-        accessKeys.forEach(keys -> {
-            AccessKeyDetails detials = new AccessKeyDetails();
-            detials.setKeyValue(keys.getKeyValue());
-            detials.setProcured_date(keys.getProcuredDate());
-            detials.setExpiry_date(keys.getExpiryDate());
-            detials.setStatus(keys.getStatus());
-            detials.setEmail(keys.getUser().getEmail());
-            keyDetails.put(keys.getKeyId(), detials);
-        });
+        return accessKeys.stream().map(this::convertToAccessKeyDetails).toList();
 
-        return keyDetails.values().stream().toList();
     }
 
 
@@ -78,19 +70,13 @@ public class AccessKeyService {
      */
 
     public List <AccessKeyDetails> getAllKeysByEmail(String email){
-        List <AccessKeys> accessKeys = this.accessKeyRepo.findByUser(this.userService.getUserByEmail(email));
-        Map <Long, AccessKeyDetails> keyDetails = new HashMap<>();
-        accessKeys.forEach(keys -> {
-            AccessKeyDetails detials = new AccessKeyDetails();
-            detials.setKeyValue(keys.getKeyValue());
-            detials.setProcured_date(keys.getProcuredDate());
-            detials.setExpiry_date(keys.getExpiryDate());
-            detials.setStatus(keys.getStatus());
-            detials.setEmail(keys.getUser().getEmail());
-            keyDetails.put(keys.getKeyId(), detials);
-        });
+        var user = this.userService.getUserByEmail(email);
+        if (user==null){
+            throw new UsernameNotFoundException("No user exist with this email");
+        }
+        List <AccessKeys> accessKeys = this.accessKeyRepo.findByUser(user);
+        return accessKeys.stream().map(this::convertToAccessKeyDetails).toList();
 
-        return keyDetails.values().stream().toList();
     }
 
     /**
@@ -131,6 +117,7 @@ public class AccessKeyService {
         return accessKeysPage.map(this::convertToAccessKeyDetails);
     }
 
+
     private AccessKeyDetails convertToAccessKeyDetails(AccessKeys accessKeys){
         AccessKeyDetails keyDetails = new AccessKeyDetails();
         keyDetails.setEmail(accessKeys.getUser().getEmail());
@@ -149,8 +136,8 @@ public class AccessKeyService {
             case "email":
                 allKeys.sort(Comparator.comparing(AccessKeyDetails::getEmail));
                 break;
-            case "expirydate":
-                allKeys.sort(Comparator.comparing(AccessKeyDetails::getExpiry_date));
+            case "procureddate":
+                allKeys.sort(Comparator.comparing(AccessKeyDetails::getProcured_date));
                 break;
             case "status":
                 allKeys.sort(Comparator.comparing(AccessKeyDetails::getStatus));
@@ -162,20 +149,37 @@ public class AccessKeyService {
         return allKeys;
     }
 
-    @Transactional
-    public AccessKeys revokeKey(String email){
-        try{
-            log.info("The error for the key {}",email);
+
+    public AccessKeys revoke(String email, String keyValue) throws Exception{
+        var key = this.accessKeyRepo.findAccessKeysByKeyValueAndUser(keyValue,this.userService.getUserByEmail(email));
+        if (!key.isPresent()){
+            throw new NotFoundException("Key Not Found");
+        }
+        else if(key.get().getStatus().equals(Status.EXPIRED)){
+            throw new BadRequestException("This Key is Expired");
+        }
+        else if(key.get().getStatus().equals(Status.REVOKED)){
+            throw new BadRequestException(("This Key is Revoked"));
+        }
+        key.get().setStatus(Status.REVOKED);
+        return this.accessKeyRepo.save(key.get());
+    }
+
+    public AccessKeys revokeKey(String email) throws BadRequestException{
+
+            log.info("The email for the key {}",email);
             // Get the key of the user.
             var accessKey = this.accessKeyRepo.findByStatusAndUser(Status.ACTIVE,this.userService.getUserByEmail(email));
-            log.info("This is the key value {}",accessKey.get().getKeyValue());
-            accessKey.get().setStatus(Status.REVOKED);
-            return this.accessKeyRepo.save(accessKey.get());
-        }
-        catch (Exception e){
-            log.info(e.getMessage());
-            return null;
-        }
+
+            if (accessKey.isEmpty()){
+                throw new BadRequestException("This user has no active key");
+            }
+            else {
+                log.info("This is the key value {}", accessKey.get().getKeyValue());
+                accessKey.get().setStatus(Status.REVOKED);
+                return this.accessKeyRepo.save(accessKey.get());
+            }
+
     }
 
     private AccessKeys generatAccessKeys(String email){

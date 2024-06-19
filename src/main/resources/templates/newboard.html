@@ -22,50 +22,10 @@
         .btn-primary {
             vertical-align: top;
         }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: box-shadow 0.3s ease;
-        }
-
-        .card h3{
-            margin-left: 10px;
-            font-family: "Montserrat SemiBold";
-            text-transform: uppercase;
-            color: #2a2a2a;
-        }
-        .card:hover {
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            color: white;
-            background: #43cea2;
-            cursor: pointer;
-            transform: scale(103%);
-            transition: 0.2s ease-out;
-        }
-        .card.btn:hover{
-            color: #007bff;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        .card-title {
-            font-weight: bold;
-            font-size: 1.25rem;
-        }
-        .card-text {
-            font-size: 0.9rem;
-            color: #555;
-        }
-        .btn-danger {
-            float: right;
-        }
         .active-key-card {
-            /*border: 2px solid #007bff;*/
             margin-bottom: 20px;
-
         }
-
-        .active-key-card:hover{
+        .active-key-card:hover {
             background: #1f389c;
         }
         .alert {
@@ -74,7 +34,7 @@
             right: 10px;
             z-index: 1000;
             display: none;
-            width: 300px; /* Adjust as needed */
+            width: 300px;
             animation: slideInRight 0.5s, fadeOut 1s 2s;
         }
         @keyframes slideInRight {
@@ -127,27 +87,36 @@
             <option value="expiryDate">Expiry Date</option>
             <option value="status">Status</option>
         </select>
- </label>
     </div>
     <div id="search-result" class="alert alert-info mt-2" style="display: none;"></div>
-    <div class="row" id="keys-container">
-        <!-- Existing keys will be displayed here -->
-        <div th:each="key : ${keys}" class="col-md-6 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${key.email}">Email</h5>
-                    <p class="card-text">
-                        <strong>Access Key:</strong> <span th:text="${key.keyValue}">Access Key</span><br>
-                        <strong>Procured Date:</strong> <span th:text="${key.procured_date}">Procured Date</span><br>
-                        <strong>Expiry Date:</strong> <span th:text="${key.expiry_date}">Expiry Date</span><br>
-                        <strong>Status:</strong> <span th:text="${key.status}">Status</span>
-                    </p>
-<!--                    <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal"-->
-<!--                       th:href="@{/web/admin/revoke?(email=${key.email})}">Revoke</a>-->
-                    <!-- Revoke Button triggering the modal -->
-                    <a th:href="@{/web/admin/sayhello?(email=${key.email}, keyValue=${key.keyValue})}">Revoke</a>
-                </div>
-            </div>
+
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Access Key</th>
+                    <th>Procured Date</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="keys-container">
+                <!-- Existing keys will be displayed here -->
+                <tr th:each="key : ${keys}">
+                    <td th:text="${key.email}">Email</td>
+                    <td th:text="${key.keyValue}">Access Key</td>
+                    <td th:text="${key.procured_date}">Procured Date</td>
+                    <td th:text="${key.expiry_date}">Expiry Date</td>
+                    <td th:text="${key.status}">Status</td>
+                    <td>
+                        <a th:href="@{/web/admin/sayhello?(email=${key.email})}">Say Hello</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
@@ -167,11 +136,8 @@
     </ul>
 </nav>
 
-
 <script th:inline="javascript">
     /*<![CDATA[*/
-
-
     let currentPage = 1;
 
     function fetchKeys(page, size, sort = null, search = null) {
@@ -198,30 +164,23 @@
 
         if (keys.length > 0) {
             keys.forEach(key => {
-                const card = document.createElement('div');
-                card.className = 'col-md-6 mb-4';
-                card.innerHTML = `
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">${key.email}</h5>
-                        <p class="card-text">
-                            <strong>Access Key:</strong> ${key.keyValue}<br>
-                            <strong>Procured Date:</strong> ${key.procured_date}<br>
-                            <strong>Expiry Date:</strong> ${key.expiry_date}<br>
-                            <strong>Status:</strong> ${key.status}
-                        </p>
-                        <a th:href="@{/web/admin/sayhello?(email=${key.email}, keyValue=${key.keyValue})}">Revoke</a>
-<!--                        <a href="#"  th:href="@{/web/admin/sayHello?(email=${key.email})}">Say Hello</a>-->
-                    </div>
-                </div>
-            `;
-                keysContainer.appendChild(card);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${key.email}</td>
+                    <td>${key.keyValue}</td>
+                    <td>${key.procured_date}</td>
+                    <td>${key.expiry_date}</td>
+                    <td>${key.status}</td>
+                    <td>
+                        <a href="#" class="btn btn-danger btn-sm revoke-btn" th:href="@{/web/admin/revoke?(email=${key.email})}">Revoke</a>
+                    </td>
+                `;
+                keysContainer.appendChild(row);
             });
         } else {
-            keysContainer.innerHTML = '<p>No keys found.</p>';
+            keysContainer.innerHTML = '<tr><td colspan="6">No keys found.</td></tr>';
         }
     }
-
 
     function renderPagination(totalPages, currentPage) {
         const paginationControls = document.getElementById('pagination-controls');
@@ -234,7 +193,6 @@
             paginationControls.appendChild(li);
         }
     }
-
 
     function gotoPage(page) {
         currentPage = page;
@@ -265,18 +223,17 @@
         currentPage = 1;
         loadKeys();
     });
-    document.getElementById('page-size').addEventListener('change', function () {
-        currentPage =1 ;
+
+    document.getElementById('page-size').addEventListener('change', function() {
+        currentPage = 1;
         loadKeys();
-    })
+    });
 
     loadKeys(); // Initial load
 
     //------------------------------------------------------------------------------------------------------------------
 
     //-------------------------------------------------------------------------------------------------------------------
-
-
 
     function searchKey(event) {
         event.preventDefault(); // Prevent form from submitting traditionally
@@ -321,9 +278,7 @@
                                 <strong>Expiry Date:</strong> ${data.expiry_date}<br>
                                 <strong>Status:</strong> ${data.status}
                             </p>
-                            <a href="/web/admin/sayhello?email=${data.email}&keyValue=${data.keyValue}"
-                            th:href="@{/web/admin/sayhello?(email=${key.email},
-                            keyValue=${key.keyValue})}">Revoke</a>
+                            <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" href="/web/admin/revoke?email=${data.email}">Revoke</a>
                         </div>
                     </div>
                 `;
@@ -331,7 +286,7 @@
                 keysContainer.insertAdjacentElement('afterbegin', activeKeyCard);
             })
             .catch(error => {
-               console.error('Fetch error:', error);
+                console.error('Fetch error:', error);
                 resultContainer.style.display = 'block';
                 resultContainer.className = 'alert alert-danger';
                 resultContainer.innerHTML = error.message;
@@ -357,25 +312,18 @@
                 keysContainer.innerHTML = '';
                 if (data.length > 0) {
                     data.forEach(key => {
-                        const card = document.createElement('div');
-                        card.className = 'col-md-6 mb-4';
-                        card.innerHTML = `
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">${key.email}</h5>
-                                    <p class="card-text">
-                                        <strong>Access Key:</strong> ${key.keyValue}<br>
-                                        <strong>Procured Date:</strong> ${key.procured_date}<br>
-                                        <strong>Expiry Date:</strong> ${key.expiry_date}<br>
-                                        <strong>Status:</strong> ${key.status}
-                                    </p>
-                                    <a href="/web/admin/sayhello?email=${key.email}&keyValue=${key.keyValue}"
-                                    th:href="@{/web/admin/sayhello?(email=${key.email},
-                                    keyValue=${key.keyValue})}">Revoke</a>
-                                </div>
-                            </div>
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${key.email}</td>
+                            <td>${key.keyValue}</td>
+                            <td>${key.procured_date}</td>
+                            <td>${key.expiry_date}</td>
+                            <td>${key.status}</td>
+                            <td>
+                                <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal" href="/web/admin/revoke?email=${key.email}">Revoke</a>
+                            </td>
                         `;
-                        keysContainer.appendChild(card);
+                        keysContainer.appendChild(row);
                     });
                 } else {
                     resultContainer.style.display = 'block';

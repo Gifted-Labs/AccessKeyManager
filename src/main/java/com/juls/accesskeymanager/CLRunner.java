@@ -12,7 +12,6 @@ import com.juls.accesskeymanager.services.AccessKeyService;
 
 public class CLRunner implements CommandLineRunner {
 
-    @Autowired
     private AccessKeyService accessKeyService;
 
     private final String email = "reynolds@gmail.com";
@@ -39,7 +38,7 @@ public class CLRunner implements CommandLineRunner {
         
         List <AccessKeyDetails> keyDetails = this.accessKeyService.getAllAccessKeys();
 
-        this.accessKeyService.revokeKey(email);
+//        this.accessKeyService.revokeKey(email);
         System.out.println("AFTER REVOKING");
         System.out.println("================");
         keyDetails.forEach(System.out::println);
