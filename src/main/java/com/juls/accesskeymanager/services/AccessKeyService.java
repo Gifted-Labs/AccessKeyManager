@@ -45,7 +45,7 @@ public class AccessKeyService {
     private final AccessKeyRepo accessKeyRepo;
     private final UserServiceImpl userService;
 
-    
+
     /**
      * The getAllAccessKeys method is used by the admin to get
      * the list of all the access keys created by users of the application. And
@@ -105,12 +105,26 @@ public class AccessKeyService {
     }
 
 
+    /**
+     * Retrieves the active access key associated with the specified email.
+     *
+     * @param email the email of the user whose active access key is to be retrieved.
+     * @return an Optional containing the active access key if found, otherwise an empty Optional.
+     */
     public Optional <AccessKeys> getActiveKeyByStatus(String email){
         Status status = Status.ACTIVE;
         var user = this.userService.getUserByEmail(email);
         return this.accessKeyRepo.findByStatusAndUser(status,user);
     }
 
+
+    /**
+     * Retrieves a paginated list of all access key details.
+     *
+     * @param page the page number to retrieve (1-based index).
+     * @param size the number of items per page.
+     * @return a Page containing AccessKeyDetails objects.
+     */
     public Page <AccessKeyDetails> getAllAccessKeyDetails(int page, int size){
         Pageable pageable = PageRequest.of(page -1, size);
         Page<AccessKeys> accessKeysPage = accessKeyRepo.findAll(pageable);
@@ -118,6 +132,12 @@ public class AccessKeyService {
     }
 
 
+    /**
+     * Converts an AccessKeys entity to an AccessKeyDetails DTO.
+     *
+     * @param accessKeys the AccessKeys entity to convert.
+     * @return the corresponding AccessKeyDetails object.
+     */
     private AccessKeyDetails convertToAccessKeyDetails(AccessKeys accessKeys){
         AccessKeyDetails keyDetails = new AccessKeyDetails();
         keyDetails.setEmail(accessKeys.getUser().getEmail());
@@ -129,6 +149,12 @@ public class AccessKeyService {
         return keyDetails;
     }
 
+    /**
+     * Sorts a list of AccessKeyDetails based on the specified criteria.
+     *
+     * @param sortBy the attribute to sort by ("email", "procureddate", or "status").
+     * @return a sorted list of AccessKeyDetails.
+     */
     public List<AccessKeyDetails> sortKeys(String sortBy) {
         List<AccessKeyDetails> allKeys = new ArrayList<>(getAllAccessKeys());
 
@@ -150,6 +176,15 @@ public class AccessKeyService {
     }
 
 
+    /**
+     * Revokes an access key based on the user's email and the key value.
+     *
+     * @param email the email of the user.
+     * @param keyValue the value of the access key to be revoked.
+     * @return the updated AccessKeys object with the revoked status.
+     * @throws NotFoundException if the access key is not found.
+     * @throws BadRequestException if the key is already expired or revoked.
+     */
     public AccessKeys revoke(String email, String keyValue) throws Exception{
         var key = this.accessKeyRepo.findAccessKeysByKeyValueAndUser(keyValue,this.userService.getUserByEmail(email));
         if (!key.isPresent()){
@@ -165,6 +200,13 @@ public class AccessKeyService {
         return this.accessKeyRepo.save(key.get());
     }
 
+    /**
+     * Revokes the active access key associated with the specified email.
+     *
+     * @param email the email of the user.
+     * @return the updated AccessKeys object with the revoked status.
+     * @throws BadRequestException if the user has no active key.
+     */
     public AccessKeys revokeKey(String email) throws BadRequestException{
 
             log.info("The email for the key {}",email);
@@ -182,6 +224,12 @@ public class AccessKeyService {
 
     }
 
+    /**
+     * Generates a new AccessKeys object for the specified user email.
+     *
+     * @param email the email of the user for whom the access key is generated.
+     * @return the newly created AccessKeys object.
+     */
     private AccessKeys generatAccessKeys(String email){
         Date currentDate = new Date(System.currentTimeMillis());
         AccessKeys accessKey = new AccessKeys();
@@ -193,10 +241,23 @@ public class AccessKeyService {
         return accessKey;
     }
 
+    /**
+     * Checks if the user with the specified email has an active access key.
+     *
+     * @param email the email of the user.
+     * @return true if the user has an active access key, false otherwise.
+     */
     public boolean userHasActiveKey(String email){
         return getActiveKeyByEmail(email)!=null;
     }
 
+    /**
+     * Generates a new access key for the specified user email.
+     *
+     * @param email the email of the user.
+     * @return the newly generated AccessKeys object.
+     * @throws BadRequestException if the user already has an active key.
+     */
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public AccessKeys generateKey(String email) throws BadRequestException {
@@ -210,6 +271,11 @@ public class AccessKeyService {
         return this.accessKeyRepo.save(key);
     }
 
+    /**
+     * Generates a random key value.
+     *
+     * @return a randomly generated key value as a String.
+     */
     private String keyValue (){
         String values = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrsquvwxyz1234567890";
         Random rand = new Random();
@@ -220,16 +286,33 @@ public class AccessKeyService {
          return generatedValue.toString();
     }
 
+    /**
+     * Calculates the expiry date based on the procured date.
+     *
+     * @param procuredDate the date the key was procured.
+     * @return the expiry date, which is one day after the procured date.
+     */
     private Date calculateExpiryDate(Date procuredDate){
         LocalDate currDate = procuredDate.toLocalDate();
         LocalDate expiryDate = currDate.plusDays(1);
         return Date.valueOf(expiryDate);
     }
 
+    /**
+     * Retrieves all access keys.
+     *
+     * @return a list of all AccessKeys objects.
+     */
     public List <AccessKeys> getAllKeys(){
         return this.accessKeyRepo.findAll();
     }
 
+    /**
+     * Saves the specified access key.
+     *
+     * @param key the AccessKeys object to be saved.
+     * @return the saved AccessKeys object.
+     */
     public AccessKeys saveAccessKey(AccessKeys key){
         return this.accessKeyRepo.save(key);
     }

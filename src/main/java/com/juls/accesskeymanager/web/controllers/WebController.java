@@ -3,23 +3,14 @@ package com.juls.accesskeymanager.web.controllers;
 import java.util.List;
 
 import com.juls.accesskeymanager.exceptions.BadRequestException;
-import org.springframework.boot.autoconfigure.security.saml2.Saml2RelyingPartyProperties.AssertingParty.Verification;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.juls.accesskeymanager.data.events.RegistrationCompleteEvent;
-import com.juls.accesskeymanager.data.models.AccessKeyDetails;
 import com.juls.accesskeymanager.data.models.AuthenticationRequest;
 import com.juls.accesskeymanager.data.token.VerificationToken;
 import com.juls.accesskeymanager.exceptions.NotFoundException;
@@ -30,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.ModelAndView;
 
 
 /**
@@ -277,6 +269,13 @@ public class WebController {
             model.addAttribute("error",e.getMessage());
             return "error";
         }
+    }
+
+
+    @GetMapping("/docs")
+    public ModelAndView showJavadoc() {
+        // Assuming your Javadoc files are in src/main/resources/static/javadoc
+        return new ModelAndView("redirect:/docs/index.html");
     }
 
 }

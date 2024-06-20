@@ -21,6 +21,15 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
+/**
+ * Configuration class for Spring Security settings.
+ * This class sets up security filter chains, authentication managers, and CORS settings.
+ * It enables web security and configures HTTP security for different request matchers.
+ *
+ * @version 1.0
+ * @since 2024
+ */
+
 @Configuration
 @EnableWebSecurity
 
@@ -29,11 +38,14 @@ public class ApplicationSecurityConfig {
 
     private final UsersDetailsService userAuthDetailsService;
 
-    
-    /** 
-     * @param http The Http Security to be returned
-     * @return SecurityFilterChain
-     * @throws Exception It throws a Series of Exceptions
+
+    /**
+     * Configures the HTTP security settings including CSRF protection, request authorization,
+     * form login settings, and authentication management.
+     *
+     * @param http the {@link HttpSecurity} to modify
+     * @return a {@link SecurityFilterChain} that defines the security filter chain
+     * @throws Exception if an error occurs while configuring HTTP security
      */
     @SuppressWarnings("removal")
     @Bean
@@ -44,6 +56,7 @@ public class ApplicationSecurityConfig {
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/public/**").permitAll()
+                            .requestMatchers("/docs/**").permitAll()
                 .requestMatchers("/api/admin/**","/web/admin/**").hasAuthority("ADMIN")
                             .requestMatchers("/api/users/**","/web/users/**").hasAuthority("USER")
                 .anyRequest().fullyAuthenticated()
@@ -71,6 +84,11 @@ public class ApplicationSecurityConfig {
      }
 
 
+    /**
+     * Configures CORS settings for the application.
+     *
+     * @return a {@link WebMvcConfigurer} that sets up CORS mappings
+     */
      @Bean
      public WebMvcConfigurer corsConfigurer(){
         return new WebMvcConfigurer() {
@@ -82,6 +100,12 @@ public class ApplicationSecurityConfig {
         };
      }
 
+    /**
+     * Configures the authentication manager with a DAO authentication provider
+     * that uses the {@link UsersDetailsService} and a {@link PasswordEncoder}.
+     *
+     * @return an {@link AuthenticationManager} configured with the DAO authentication provider
+     */
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -91,6 +115,11 @@ public class ApplicationSecurityConfig {
         return new ProviderManager(authProvider);
     }
 
+    /**
+     * Provides a password encoder bean that uses the BCrypt hashing algorithm.
+     *
+     * @return a {@link BCryptPasswordEncoder} instance
+     */
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();

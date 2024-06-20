@@ -184,6 +184,24 @@
             left: 0;
         }
 
+        footer a {
+            text-decoration: none;
+            color: aqua;
+            padding-bottom: 10px;
+        }
+
+        footer a:hover{
+            color: ghostwhite;
+            text-decoration: underline;
+        }
+
+        .fa-book{
+            word-spacing: 5px;
+            max-width: 200px;
+
+
+        }
+
         @media (max-width: 480px) {
             .wrapper {
                 padding: 20px 15px;
@@ -237,7 +255,10 @@
     </form>
     <div class="sign-txt">Already registered? <a th:href="@{/login}">Sign in</a></div>
 </div>
-
+<footer>
+    <a th:href="@{/documentation/index.html}" class="fas fa-book">API DOCUMENTATION</a> <br />
+    &copy; Gifted Labs Inc Access KeyManager 2024
+</footer>
 <!-- Alert Box -->
 <div id="alert" class="alert"></div>
 

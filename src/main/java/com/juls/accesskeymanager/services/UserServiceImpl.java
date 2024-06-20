@@ -168,7 +168,12 @@ public class UserServiceImpl implements UserService{
     }
 
 
-
+    /**
+     * Validates a given verification token.
+     *
+     * @param token the verification token to be validated
+     * @return a string indicating the validation result: "Invalid Verification Token", "Verification Token Expired", or "valid"
+     */
     @Override
     public String validateToken(String token) {
         VerificationToken verificationToken = this.verificationRepository.findByToken(token);
@@ -193,6 +198,13 @@ public class UserServiceImpl implements UserService{
         return "valid";
     }
 
+    /**
+     * Validates a given password reset token.
+     *
+     * @param token the reset token to be validated
+     * @return a string indicating the validation result: "Invalid Verification Token", "Verification Token Expired", or "valid"
+     */
+
     public String validateResetToken(String token){
         VerificationToken verificationToken = this.verificationRepository.findByToken(token);
         if (verificationToken==null){
@@ -207,7 +219,17 @@ public class UserServiceImpl implements UserService{
 
         return "valid";
     }
-    
+
+
+    /**
+     * Updates the password for a given email.
+     *
+     * @param email the email of the user whose password is to be updated
+     * @param password the new password
+     * @param confirm the confirmation of the new password
+     * @return true if the password was successfully updated, false otherwise
+     * @throws BadRequestException if the account is not verified or if the email is empty
+     */
 
     public boolean updatePassword(String email , String password, String confirm) throws BadRequestException{
         boolean flag = false;
@@ -233,7 +255,15 @@ public class UserServiceImpl implements UserService{
     }
 
 
-
+    /**
+     * Initiates the password reset process for a given email.
+     *
+     * @param email the email of the user requesting the password reset
+     * @param url the base URL to be used in the reset link
+     * @param type the type of the request ("web" or "api")
+     * @return the generated reset link
+     * @throws NotFoundException if the user is not found
+     */
     
     public String resetPasswordInit(String email, String url,String type) throws NotFoundException{
         
@@ -255,11 +285,24 @@ public class UserServiceImpl implements UserService{
         return resetLink;
     }
 
-
+    /**
+     * Saves a verification token for a given user.
+     *
+     * @param user the user for whom the verification token is to be saved
+     * @param token the verification token to be saved
+     */
     public void saveVerificationToken(Users user, String token){
         var verificationToken = new VerificationToken(token, user);
         this.verificationRepository.save(verificationToken);
     }
+
+
+    /**
+     * Finds a verification token by its token string.
+     *
+     * @param token the token string to search for
+     * @return the found verification token, or null if not found
+     */
 
     public VerificationToken findToken(String token){
         VerificationToken theToken = this.verificationRepository.findByToken(token);

@@ -30,12 +30,13 @@
             position: relative;
             background: #fff;
             padding: 30px 25px;
-            border-radius: 10px;
+            border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             text-align: center;
             max-width: 400px;
             width: 100%;
-            margin: 0 auto;
+            margin: 20px auto;
+            bottom: 30px;
         }
 
         .wrapper header {
@@ -185,17 +186,36 @@
             animation: shake 0.3s ease-in-out;
         }
 
-        footer {
+        footer{
+            position: fixed;
+            bottom: 0;
             text-align: center;
             margin-top: auto;
             padding: 20px;
             color: #fff;
             background: rgba(0, 0, 0, 0.3);
             width: 100%;
-            position: relative;
-            bottom: 0;
-            left: 0;
+
         }
+
+        footer a {
+            text-decoration: none;
+            color: aqua;
+            padding-bottom: 10px;
+        }
+
+        footer a:hover{
+            color: ghostwhite;
+            text-decoration: underline;
+        }
+
+        .fa-book{
+            word-spacing: 5px;
+            max-width: 200px;
+
+
+        }
+
 
     </style>
 </head>
@@ -229,12 +249,17 @@
     <div class="sign-txt">Not yet a member? <a href="/public/register">Signup now</a></div>
 </div>
 
-<!-- Footer -->
-<footer>
-    &copy; Gifted Labs Inc Access KeyManager 2024
-</footer>
+
 
 <div class="alert" id="alert"></div>
+
+<!-- Footer -->
+<footer>
+    <a th:href="@{/public/docs}" class="fas fa-book">API DOCUMENTATION</a> <br />
+
+    &copy; Gifted Labs Inc Access KeyManager 2024
+
+</footer>
 
 <!-- Custom JS for validation and alerts -->
 <script>
