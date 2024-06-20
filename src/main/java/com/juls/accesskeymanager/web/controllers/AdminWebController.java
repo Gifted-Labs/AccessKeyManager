@@ -71,13 +71,15 @@ public class AdminWebController {
     public String sayhello(@RequestParam("email")String email, @RequestParam("keyValue") String keyValue, Model model) throws Exception{
         try{
             accessKeyService.revoke(email,keyValue);
-            model.addAttribute("error", email+"'s key revoked successfully");
+            model.addAttribute("error","Key revoked successfully") ;
             return "error";
         }
         catch (Exception e){
             model.addAttribute("error",e.getMessage());
             return "error";
         }
+
+
     }
 
 //    @PreAuthorize("hasAuthority('ADMIN')")

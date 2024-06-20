@@ -77,6 +77,9 @@
             width: 300px; /* Adjust as needed */
             animation: slideInRight 0.5s, fadeOut 1s 2s;
         }
+
+
+
         @keyframes slideInRight {
             from {
                 transform: translateX(100%);
@@ -145,7 +148,8 @@
 <!--                    <a class="btn btn-danger btn-sm revoke-btn" data-toggle="modal" data-target="#revokeModal"-->
 <!--                       th:href="@{/web/admin/revoke?(email=${key.email})}">Revoke</a>-->
                     <!-- Revoke Button triggering the modal -->
-                    <a th:href="@{/web/admin/sayhello?(email=${key.email}, keyValue=${key.keyValue})}">Revoke</a>
+                    <a      class="btn btn-danger btn-sm revoke-btn"
+                            th:href="@{/web/admin/sayhello?(email=${key.email}, keyValue=${key.keyValue})}">Revoke</a>
                 </div>
             </div>
         </div>
@@ -166,7 +170,6 @@
         </li>
     </ul>
 </nav>
-
 
 <script th:inline="javascript">
     /*<![CDATA[*/
@@ -210,7 +213,9 @@
                             <strong>Expiry Date:</strong> ${key.expiry_date}<br>
                             <strong>Status:</strong> ${key.status}
                         </p>
-                        <a th:href="@{/web/admin/sayhello?(email=${key.email}, keyValue=${key.keyValue})}">Revoke</a>
+                        <a th:href="@{/web/admin/sayhello?(email=${key.email}, keyValue=${key.keyValue})}"
+                        class="btn btn-danger btn-sm revoke-btn"
+                        >Revoke</a>
 <!--                        <a href="#"  th:href="@{/web/admin/sayHello?(email=${key.email})}">Say Hello</a>-->
                     </div>
                 </div>
@@ -322,8 +327,9 @@
                                 <strong>Status:</strong> ${data.status}
                             </p>
                             <a href="/web/admin/sayhello?email=${data.email}&keyValue=${data.keyValue}"
-                            th:href="@{/web/admin/sayhello?(email=${key.email},
-                            keyValue=${key.keyValue})}">Revoke</a>
+                            class="btn btn-danger btn-sm revoke-btn"
+                            th:href="@{/web/admin/sayhello?(email=${data.email},
+                            keyValue=${data.keyValue})}">Revoke</a>
                         </div>
                     </div>
                 `;
@@ -370,6 +376,7 @@
                                         <strong>Status:</strong> ${key.status}
                                     </p>
                                     <a href="/web/admin/sayhello?email=${key.email}&keyValue=${key.keyValue}"
+                                    class="btn btn-danger btn-sm revoke-btn"
                                     th:href="@{/web/admin/sayhello?(email=${key.email},
                                     keyValue=${key.keyValue})}">Revoke</a>
                                 </div>
@@ -397,6 +404,9 @@
     }
 
     document.getElementById('searchForm').addEventListener('submit', searchKey);
+
+
+
     /*]]>*/
 </script>
 
