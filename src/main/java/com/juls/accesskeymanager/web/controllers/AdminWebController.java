@@ -4,11 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.juls.accesskeymanager.exceptions.BadRequestException;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
