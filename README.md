@@ -18,7 +18,9 @@ The Application is in two folds, the API and the Web application, the following 
   1. [Prerequisites](#prerequisites)
   2. [Installation](#installation)
   3. [Running the Application](#running-the-application)
-  4. [Endpoints](#endpoints)
+  4. [REST Endpoints](#rest-endpoints)
+5. [WEB Endpoints](#web-endpoints)
+6. [Technologies & Tools](#technologoies&tools)
 2. [Customer Requirements](#customer-requirements)
    1. [School IT Personnel](#school-it-personnel)
      1. [Sign up and Login](#sign-up-and-login)
@@ -77,7 +79,7 @@ Start the Spring Boot application:
 mvn spring-boot:run
 ```
 
-### API Endpoints
+### REST Endpoints
 
 Here are the main endpoints available in the application:
 
@@ -121,6 +123,17 @@ Here are the main endpoints available in the application:
 - Get All Keys Of A School: `GET /web/admin/search`
 - Revoke Key: `POST /api/admin/revoke` ![img_12.png](img_12.png)
 - Key Status Lookup: `GET /api/admin/keys/status?email={schoolEmail}` ![img_13.png](img_13.png) ![img_14.png](img_14.png)
+
+
+## Technologies  & Tools
+- IntelliJ 
+- Springboot
+- Spring Data JPA
+- Thymeleaf
+- Spring Security
+- Lombok
+- Spring DevTools
+- JUnit & Mockito
 
 
 ## Customer Requirements
@@ -198,6 +211,9 @@ api/admin/activeKey?email=("Email of the school")
 - The Micro-Focus admin can search through the cards of keys to find the active key by entering the schools email.
 
 ![img_1.png](img_1.png)
+
+## ER Diagram
+- This is the Entity Relational Diagram of the application ![ER Diagram.png](ER%20Diagram.png)
 
 ## Technical Requirements
 
